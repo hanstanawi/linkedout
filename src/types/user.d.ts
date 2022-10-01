@@ -5,6 +5,7 @@ interface IUserDto {
   lastName: string;
   birthDate: string;
   about: string | null;
+  profileImage: string | null;
 }
 
 interface IUser extends IUserDto {
