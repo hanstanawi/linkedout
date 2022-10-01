@@ -19,7 +19,7 @@ export async function updateUser(
   userId: string,
   user: IUserDto
 ): Promise<IUser> {
-  const res = await axiosInstance.post<IUser>(`/users/${userId}`, user);
+  const res = await axiosInstance.put<IUser>(`/users/${userId}`, user);
   return res.data;
 }
 
