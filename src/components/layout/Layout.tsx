@@ -5,7 +5,7 @@ function Layout() {
   return (
     <div className="bg-lightGrey min-h-screen max-w-screen">
       <Navbar />
-      <main className="pt-20">
+      <main className="h-full">
         <Outlet />
       </main>
     </div>
