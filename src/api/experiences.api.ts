@@ -10,7 +10,7 @@ export async function getExperience(
 }
 
 export async function createExperience(
-  experience: IExperience
+  experience: IExperienceDto
 ): Promise<IExperience> {
   const res = await axiosInstance.post<IExperience>('/experiences', experience);
   return res.data;
