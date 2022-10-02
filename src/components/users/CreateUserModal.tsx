@@ -1,31 +1,66 @@
-import Modal from 'components/modals/Modal';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+
+import Modal from 'components/modals/Modal';
+import { useAppDispatch } from 'hooks/useAppDispatch';
+import { createUser, updateUser } from 'app/slices/users.slice';
 
 type CreateUserModalProps = {
   isOpen: boolean;
   setOpen: (state: boolean) => void;
+  mode: 'update' | 'create';
+  user: IUser | null;
 };
 
-function CreateUserModal({ isOpen, setOpen }: CreateUserModalProps) {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    getFieldState,
-    formState: { errors, isValid },
-  } = useForm<IUserDto>({
+function CreateUserModal({
+  isOpen,
+  setOpen,
+  mode,
+  user,
+}: CreateUserModalProps) {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { register, handleSubmit, reset } = useForm<IUserDto>({
     mode: 'onBlur',
+    defaultValues: mode === 'update' && user ? user : undefined,
   });
 
-  const submitHandler: SubmitHandler<IUserDto> = (data) => {
-    console.log(data);
+  const createUserHandler: SubmitHandler<IUserDto> = async (data) => {
+    try {
+      const createdUser = await dispatch(
+        createUser({ ...data, profileImage: null })
+      ).unwrap();
+      reset();
+      setOpen(false);
+      navigate(`/user/${createdUser.id}`);
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  const updateUserHandler: SubmitHandler<IUserDto> = async (data) => {
+    if (user) {
+      try {
+        await dispatch(
+          updateUser({ ...data, profileImage: null, id: user.id })
+        ).unwrap();
+        reset();
+        setOpen(false);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  const modalTitle = mode === 'create' ? 'Add New Member' : 'Update Profile';
+
+  const submitHandler =
+    mode === 'create' ? createUserHandler : updateUserHandler;
 
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>
       <div className="w-full">
-        <h3 className="font-semibold text-2xl pb-2">Add New Member</h3>
+        <h3 className="font-semibold text-2xl pb-2">{modalTitle}</h3>
         <hr />
         <section>
           <form
@@ -70,8 +105,8 @@ function CreateUserModal({ isOpen, setOpen }: CreateUserModalProps) {
               </label>
               <input
                 type="text"
-                name="birthDate"
                 id="birthDate"
+                {...register('birthDate')}
                 className="border border-gray-200 p-2 rounded-md font-light text-sm"
               />
             </div>
