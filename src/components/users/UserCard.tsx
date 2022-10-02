@@ -11,7 +11,7 @@ function UserCard({ user }: UserCardProps) {
     <div className="rounded-lg bg-white py-10 px-6 text-center xl:px-10 xl:text-left">
       <div className="space-y-6 xl:space-y-8">
         <img
-          className="mx-auto h-28 w-28 object-cover rounded-full xl:h-40 xl:w-40"
+          className="mx-auto h-24 w-24 object-cover rounded-full xl:h-32 xl:w-32"
           src={user.profileImage || placeholder}
           alt=""
         />

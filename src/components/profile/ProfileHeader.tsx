@@ -8,14 +8,14 @@ type ProfileHeaderProps = {
 function ProfileHeader({ user }: ProfileHeaderProps) {
   const userAge = formatBirthDateAsAge(user.birthDate);
   return (
-    <div className="flex flex-col justify-center items-center w-full max-w-5xl mx-auto bg-white px-20 py-8">
+    <section className="flex flex-col flex-shrink justify-center items-center w-1/3 mx-auto bg-white px-20 py-8 h-3/4 rounded-md">
       <div className="flex flex-col items-center gap-y-2">
         <img
-          className="inline-block h-24 w-24 object-cover rounded-full"
+          className="inline-block h-20 w-20 object-cover rounded-full"
           src={user.profileImage || placeholder}
           alt="profile"
         />
-        <h2 className="text-3xl font-bold">{`${user.firstName} ${user.lastName}, ${userAge}`}</h2>
+        <h2 className="text-2xl font-semibold">{`${user.firstName} ${user.lastName}, ${userAge}`}</h2>
         <p>{user.about}</p>
         <div>
           <button
@@ -26,7 +26,7 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
