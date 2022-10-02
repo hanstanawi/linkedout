@@ -16,7 +16,7 @@ export async function createExperience(
   return res.data;
 }
 
-export async function updateUser(
+export async function updateExperience(
   experienceId: string,
   experience: IExperienceDto
 ): Promise<IExperience> {
@@ -27,6 +27,6 @@ export async function updateUser(
   return res.data;
 }
 
-export async function deleteUser(experienceId: string): Promise<void> {
+export async function deleteExperience(experienceId: string): Promise<void> {
   await axiosInstance.delete<void>(`/experiences/${experienceId}`);
 }
