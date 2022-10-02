@@ -55,7 +55,7 @@ function UsersPage() {
         <h3 className="font-semibold text-2xl">Our Team</h3>
         <button
           type="button"
-          className="bg-blue-300 text-white rounded-md text-sm font-semibold py-2 px-4"
+          className="bg-blue-400 hover:bg-blue-600 text-white rounded-md text-sm font-semibold py-2 px-4"
           onClick={() => setIsModalOpen(true)}
         >
           Add Member
