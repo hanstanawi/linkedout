@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaUserPlus } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import CreateUserModal from 'components/users/CreateUserModal';
 import UserCard from 'components/users/UserCard';
 import { useAppSelector } from 'hooks/useAppSelector';
@@ -14,6 +15,12 @@ function UsersPage() {
   const users = useAppSelector(getAllUsers);
   const requestStatus = useAppSelector(getUsersStatus);
   const error = useAppSelector(getUsersError);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(`Something wrong happened! ${error}`);
+    }
+  }, [error]);
 
   const openModalHandler = (state: boolean) => {
     setIsModalOpen(state);
@@ -54,12 +61,14 @@ function UsersPage() {
         </div>
         {content}
       </section>
-      <CreateUserModal
-        setOpen={openModalHandler}
-        isOpen={isModalOpen}
-        mode="create"
-        user={null}
-      />
+      {isModalOpen && (
+        <CreateUserModal
+          setOpen={openModalHandler}
+          isOpen={isModalOpen}
+          mode="create"
+          user={null}
+        />
+      )}
     </>
   );
 }
