@@ -3,12 +3,14 @@ import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import ReactDatePicker from 'react-datepicker';
 import cx from 'classnames';
+import { ToastContainer, toast } from 'react-toastify';
 
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/layout/LoadingSpinner';
 
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { createUser, updateUser } from 'app/slices/users.slice';
+import moment from 'moment';
 
 type CreateUserModalProps = {
   isOpen: boolean;
@@ -39,9 +41,9 @@ function CreateUserModal({
     register,
     handleSubmit,
     reset,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<FormValues>({
-    mode: 'onBlur',
+    mode: 'onSubmit',
     defaultValues:
       mode === 'update' && user
         ? { ...user, birthDate: new Date(user.birthDate) }
@@ -50,20 +52,22 @@ function CreateUserModal({
 
   const createUserHandler: SubmitHandler<FormValues> = async (data) => {
     try {
-      // TODO: Clean up this
       setLoading(true);
-      const createdUser = await dispatch(
-        createUser({
-          ...data,
-          profileImage: null,
-          birthDate: data.birthDate.toISOString(),
-        })
-      ).unwrap();
+
+      const userBody: IUserDto = {
+        ...data,
+        profileImage: null, // fix this
+        birthDate: data.birthDate.toISOString(),
+      };
+
+      const createdUser = await dispatch(createUser(userBody)).unwrap();
+      toast.success('User created!');
       reset();
       setOpen(false);
       navigate(`/user/${createdUser.id}`);
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Something wrong happened! ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -73,22 +77,30 @@ function CreateUserModal({
     if (user) {
       try {
         setLoading(true);
-        await dispatch(
-          updateUser({
-            ...data,
-            profileImage: null,
-            id: user.id,
-            birthDate: data.birthDate.toISOString(),
-          })
-        ).unwrap();
+
+        const userBody = {
+          ...data,
+          profileImage: null, // fix this
+          id: user.id,
+          birthDate: moment(data.birthDate).format('YYYY-MM-DD'),
+        };
+
+        await dispatch(updateUser(userBody)).unwrap();
         reset();
         setOpen(false);
-      } catch (err) {
-        console.log(err);
+        toast.success('User updated');
+      } catch (err: any) {
+        console.error(err);
+        toast.error(`Something wrong happened! ${err.message}`);
       } finally {
         setLoading(false);
       }
     }
+  };
+
+  const closeModalHandler = () => {
+    setOpen(false);
+    reset();
   };
 
   const modalTitle = mode === 'create' ? 'Add New Member' : 'Update Profile';
@@ -217,20 +229,15 @@ function CreateUserModal({
             <div className="flex gap-x-2 pt-4 pb-1">
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={closeModalHandler}
                 className="bg-gray-100 flex-1 hover:bg-gray-300 text-black rounded-md text-sm font-semibold py-2 px-4"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className={cx(
-                  isValid
-                    ? 'bg-blue-400  hover:bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-300',
-                  ' flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center'
-                )}
-                disabled={!isValid}
+                className=" bg-blue-400  hover:bg-blue-600 text-white
+                  flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
               >
                 {isLoading ? <LoadingSpinner /> : 'Submit'}
               </button>

@@ -1,11 +1,15 @@
+import moment from 'moment';
 import cx from 'classnames';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import ReactDatePicker from 'react-datepicker';
+
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/layout/LoadingSpinner';
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { createExperience, updateExperience } from 'app/slices/users.slice';
-import { useState } from 'react';
 
 type ExperienceModalProps = {
   isOpen: boolean;
@@ -13,6 +17,16 @@ type ExperienceModalProps = {
   mode: 'update' | 'create';
   experience: IExperience | null;
   userId: string;
+};
+
+type FormValues = {
+  jobTitle: string;
+  startDate: Date;
+  endDate: Date | null;
+  companyName: string;
+  companyLogo: string | null;
+  jobDescription: string | null;
+  isCurrent: boolean;
 };
 
 function ExperienceModal({
@@ -25,62 +39,98 @@ function ExperienceModal({
   const [isLoading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const {
+    control,
     register,
     handleSubmit,
     reset,
     setValue,
     watch,
-    formState: { errors, isValid },
-  } = useForm<IExperienceDto>({
-    mode: 'onBlur',
-    defaultValues: mode === 'update' && experience ? experience : undefined,
+    getValues,
+    formState: { errors },
+  } = useForm<FormValues>({
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
+    defaultValues:
+      mode === 'update' && experience
+        ? {
+            ...experience,
+            startDate: new Date(experience.startDate),
+            endDate: new Date(experience.endDate || ''),
+          }
+        : undefined,
   });
 
   const { isCurrent } = watch();
 
-  const createExperienceHandler: SubmitHandler<IExperienceDto> = async (
-    data
-  ) => {
+  useEffect(() => {
+    if (isCurrent) {
+      setValue('endDate', null, { shouldValidate: true });
+    }
+  }, [isCurrent, setValue]);
+
+  const createExperienceHandler: SubmitHandler<FormValues> = async (data) => {
     try {
       setLoading(true);
-      await dispatch(
-        createExperience({ ...data, companyLogo: null, userId })
-      ).unwrap();
+
+      const experienceBody = {
+        ...data,
+        companyLogo: null, // fix this
+        userId,
+        startDate: moment(data.startDate).format('YYYY-MM-DD'),
+        endDate: data.endDate
+          ? moment(data.endDate).format('YYYY-MM-DD')
+          : null,
+      };
+
+      await dispatch(createExperience(experienceBody)).unwrap();
+      toast.success('Experience created!');
       reset();
       setOpen(false);
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Something wrong happened! ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const updateExperienceHandler: SubmitHandler<IExperienceDto> = async (
-    data
-  ) => {
+  const updateExperienceHandler: SubmitHandler<FormValues> = async (data) => {
     if (experience) {
       try {
         setLoading(true);
-        await dispatch(
-          updateExperience({
-            ...data,
-            id: experience.id,
-            companyLogo: null,
-            userId,
-          })
-        ).unwrap();
+
+        const experienceBody = {
+          ...data,
+          id: experience.id,
+          companyLogo: null,
+          startDate: moment(data.startDate).format('YYYY-MM-DD'),
+          endDate: data.endDate
+            ? moment(data.endDate).format('YYYY-MM-DD')
+            : null,
+          userId,
+        };
+
+        await dispatch(updateExperience(experienceBody)).unwrap();
+
+        toast.success('Experience updated!');
         reset();
         setOpen(false);
-      } catch (err) {
-        console.log(err);
+      } catch (err: any) {
+        console.error(err);
+        toast.error(`Something wrong happened! ${err.message}`);
       } finally {
         setLoading(false);
       }
     }
   };
 
+  const closeModalHandler = () => {
+    setOpen(false);
+    reset();
+  };
+
   const setCurrentJob = () => {
-    setValue('isCurrent', !isCurrent, { shouldValidate: false });
+    setValue('isCurrent', !isCurrent, { shouldValidate: true });
   };
 
   const modalTitle =
@@ -97,10 +147,10 @@ function ExperienceModal({
         <section>
           <form
             onSubmit={handleSubmit(submitHandler)}
-            className="flex flex-col gap-y-2 px-2 py-2"
+            className="flex flex-col gap-y-1 px-2 py-2"
           >
             {/* JOB TITLE */}
-            <div className="flex flex-1 flex-col gap-y-2 py-1">
+            <div className="flex flex-1 flex-col gap-y-1 py-1">
               <label htmlFor="lastName" className="text-sm">
                 Job Title
               </label>
@@ -126,7 +176,7 @@ function ExperienceModal({
               </p>
             </div>
             {/* COMPANY NAME */}
-            <div className="flex flex-1 flex-col gap-y-2 py-1">
+            <div className="flex flex-1 flex-col gap-y-1 py-1">
               <label htmlFor="lastName" className="text-sm">
                 Company Name
               </label>
@@ -152,38 +202,116 @@ function ExperienceModal({
             </div>
             {/* PERIOD */}
             <div className="flex gap-x-4 w-full py-1">
-              <div className="flex flex-1 flex-col gap-y-2">
+              <div className="flex flex-1 flex-col gap-y-1">
                 <label htmlFor="firstName" className="text-sm text-gray-600">
                   Start Date
                 </label>
-                <input
-                  type="text"
-                  {...register('startDate', {
+                <Controller
+                  control={control}
+                  name="startDate"
+                  rules={{
                     required: 'Start date is required',
-                  })}
-                  id="startDate"
-                  placeholder="Start date"
-                  className="border border-gray-200 p-2 rounded-md field-input font-light text-sm"
+                    validate: {
+                      isBeforeEndDate: (v) => {
+                        const endDateVal = getValues('endDate');
+                        if (!endDateVal) {
+                          return true;
+                        }
+                        return (
+                          moment(v).isBefore(endDateVal) ||
+                          'Must be before end date'
+                        );
+                      },
+                    },
+                  }}
+                  render={({ field: { value, ...fieldProps } }) => {
+                    return (
+                      <div>
+                        <ReactDatePicker
+                          {...fieldProps}
+                          className={cx(
+                            errors.startDate
+                              ? 'border-red-600'
+                              : 'border-gray-200',
+                            'border p-2 rounded-md field-input font-light text-sm outline-blue-400 w-full'
+                          )}
+                          placeholderText="Start date"
+                          selected={value}
+                          dateFormat="yyyy/MM/dd"
+                          maxDate={new Date()}
+                          showMonthDropdown
+                          showYearDropdown
+                          dropdownMode="select"
+                        />
+                      </div>
+                    );
+                  }}
                 />
+                <p
+                  className={cx(
+                    'text-[10px] font-light text-red-600',
+                    errors.startDate ? 'opacity-100' : 'opacity-0'
+                  )}
+                >
+                  {errors.startDate?.message}
+                </p>
               </div>
-              <div className="flex flex-1 flex-col gap-y-2">
+              <div className="flex flex-1 flex-col gap-y-1">
                 <label htmlFor="lastName" className="text-sm text-gray-600">
                   End Date
                 </label>
-                <input
-                  type="text"
-                  {...register('endDate', {
+                <Controller
+                  control={control}
+                  name="endDate"
+                  rules={{
                     required: !isCurrent ? 'End date is required' : false,
-                  })}
-                  disabled={isCurrent}
-                  id="endDate"
-                  placeholder="End date"
-                  className="border border-gray-200 p-2 rounded-md font-light text-sm"
+                    validate: {
+                      isAfterStartDate: (v) => {
+                        const startDateVal = getValues('startDate');
+                        if (isCurrent) return true;
+                        return (
+                          moment(v).isAfter(startDateVal) ||
+                          'Must be after start date'
+                        );
+                      },
+                    },
+                  }}
+                  render={({ field: { value, ...fieldProps } }) => {
+                    return (
+                      <div>
+                        <ReactDatePicker
+                          {...fieldProps}
+                          className={cx(
+                            errors.endDate
+                              ? 'border-red-600'
+                              : 'border-gray-200',
+                            'border p-2 rounded-md field-input font-light text-sm outline-blue-400 w-full'
+                          )}
+                          placeholderText="End date"
+                          selected={value}
+                          disabled={isCurrent}
+                          maxDate={new Date()}
+                          dateFormat="yyyy/MM/dd"
+                          showMonthDropdown
+                          showYearDropdown
+                          dropdownMode="select"
+                        />
+                      </div>
+                    );
+                  }}
                 />
+                <p
+                  className={cx(
+                    'text-[10px] font-light text-red-600',
+                    errors.endDate ? 'opacity-100' : 'opacity-0'
+                  )}
+                >
+                  {errors.endDate?.message}
+                </p>
               </div>
             </div>
             {/* JOB DESC */}
-            <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
+            <div className="flex flex-1 flex-col gap-y-1 text-sm py-1">
               <label htmlFor="lastName">Job Description</label>
               <textarea
                 id="about"
@@ -192,11 +320,12 @@ function ExperienceModal({
               />
             </div>
             {/* CURRENT JOB */}
-            <div className="flex items-center my-2.5" onClick={setCurrentJob}>
+            <div className="flex items-center my-2.5">
               <input
                 type="checkbox"
                 id="isCurrentJob"
-                className="h-4 w-4 cursor-pointer green-accent border-transparent"
+                className="h-4 w-4 cursor-pointer border-transparent"
+                onClick={setCurrentJob}
                 {...register('isCurrent')}
               />
               <label
@@ -209,20 +338,15 @@ function ExperienceModal({
             <div className="flex gap-x-2 pt-4 pb-1">
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={closeModalHandler}
                 className="bg-gray-100 flex-1 hover:bg-gray-300 text-black rounded-md text-sm font-semibold py-2 px-4"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className={cx(
-                  isValid
-                    ? 'bg-blue-400  hover:bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-300',
-                  ' flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center'
-                )}
-                disabled={!isValid}
+                className="bg-blue-400  hover:bg-blue-600 text-white
+                flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
               >
                 {isLoading ? <LoadingSpinner /> : 'Submit'}
               </button>
