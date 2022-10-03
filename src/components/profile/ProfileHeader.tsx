@@ -41,13 +41,14 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
           </div>
         </div>
       </section>
-
-      <CreateUserModal
-        isOpen={isModalOpen}
-        setOpen={openModalHandler}
-        mode="update"
-        user={user}
-      />
+      {isModalOpen && (
+        <CreateUserModal
+          isOpen={isModalOpen}
+          setOpen={openModalHandler}
+          mode="update"
+          user={user}
+        />
+      )}
     </>
   );
 }

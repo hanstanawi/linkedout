@@ -43,13 +43,15 @@ function ExperiencesList({ experiences, userId }: ExperiencesListProps) {
           ))}
         </ul>
       </section>
-      <ExperienceModal
-        userId={userId}
-        isOpen={isModalOpen}
-        setOpen={openModalHandler}
-        mode="create"
-        experience={null}
-      />
+      {isModalOpen && (
+        <ExperienceModal
+          userId={userId}
+          isOpen={isModalOpen}
+          setOpen={openModalHandler}
+          mode="create"
+          experience={null}
+        />
+      )}
     </>
   );
 }
