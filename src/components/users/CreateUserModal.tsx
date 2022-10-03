@@ -1,7 +1,12 @@
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import ReactDatePicker from 'react-datepicker';
+import cx from 'classnames';
 
 import Modal from 'components/modals/Modal';
+import LoadingSpinner from 'components/layout/LoadingSpinner';
+
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { createUser, updateUser } from 'app/slices/users.slice';
 
@@ -12,42 +17,76 @@ type CreateUserModalProps = {
   user: IUser | null;
 };
 
+type FormValues = {
+  firstName: string;
+  lastName: string;
+  birthDate: Date;
+  about: string | null;
+  profileImage: string | null;
+};
+
 function CreateUserModal({
   isOpen,
   setOpen,
   mode,
   user,
 }: CreateUserModalProps) {
+  const [isLoading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { register, handleSubmit, reset } = useForm<IUserDto>({
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<FormValues>({
     mode: 'onBlur',
-    defaultValues: mode === 'update' && user ? user : undefined,
+    defaultValues:
+      mode === 'update' && user
+        ? { ...user, birthDate: new Date(user.birthDate) }
+        : undefined,
   });
 
-  const createUserHandler: SubmitHandler<IUserDto> = async (data) => {
+  const createUserHandler: SubmitHandler<FormValues> = async (data) => {
     try {
+      // TODO: Clean up this
+      setLoading(true);
       const createdUser = await dispatch(
-        createUser({ ...data, profileImage: null })
+        createUser({
+          ...data,
+          profileImage: null,
+          birthDate: data.birthDate.toISOString(),
+        })
       ).unwrap();
       reset();
       setOpen(false);
       navigate(`/user/${createdUser.id}`);
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const updateUserHandler: SubmitHandler<IUserDto> = async (data) => {
+  const updateUserHandler: SubmitHandler<FormValues> = async (data) => {
     if (user) {
       try {
+        setLoading(true);
         await dispatch(
-          updateUser({ ...data, profileImage: null, id: user.id })
+          updateUser({
+            ...data,
+            profileImage: null,
+            id: user.id,
+            birthDate: data.birthDate.toISOString(),
+          })
         ).unwrap();
         reset();
         setOpen(false);
       } catch (err) {
         console.log(err);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -60,7 +99,7 @@ function CreateUserModal({
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>
       <div className="w-full">
-        <h3 className="font-semibold text-2xl pb-2">{modalTitle}</h3>
+        <h3 className="font-semibold text-xl pb-2">{modalTitle}</h3>
         <hr />
         <section>
           <form
@@ -69,7 +108,7 @@ function CreateUserModal({
           >
             {/* USER NAME */}
             <div className="flex gap-x-4 w-full py-1">
-              <div className="flex flex-1 flex-col gap-y-2">
+              <div className="flex flex-1 flex-col gap-y-1.5">
                 <label htmlFor="firstName" className="text-sm text-gray-600">
                   First Name
                 </label>
@@ -80,10 +119,21 @@ function CreateUserModal({
                   })}
                   id="firstName"
                   placeholder="Your first name"
-                  className="border border-gray-200 p-2 rounded-md field-input font-light text-sm"
+                  className={cx(
+                    errors.firstName ? 'border-red-600' : 'border-gray-200',
+                    'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
+                  )}
                 />
+                <p
+                  className={cx(
+                    'text-[10px] font-light text-red-600',
+                    errors.firstName ? 'opacity-100' : 'opacity-0'
+                  )}
+                >
+                  {errors.firstName?.message}
+                </p>
               </div>
-              <div className="flex flex-1 flex-col gap-y-2">
+              <div className="flex flex-1 flex-col gap-y-1.5">
                 <label htmlFor="lastName" className="text-sm text-gray-600">
                   Last Name
                 </label>
@@ -94,21 +144,63 @@ function CreateUserModal({
                   })}
                   id="lastName"
                   placeholder="Your last name"
-                  className="border border-gray-200 p-2 rounded-md font-light text-sm"
+                  className={cx(
+                    errors.lastName ? 'border-red-600' : 'border-gray-200',
+                    'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
+                  )}
                 />
+                <p
+                  className={cx(
+                    'text-[10px] font-light text-red-600 -pt-1',
+                    errors.lastName ? 'opacity-100' : 'opacity-0'
+                  )}
+                >
+                  {errors.lastName?.message}
+                </p>
               </div>
             </div>
             {/* BIRTH DATE */}
-            <div className="flex flex-1 flex-col gap-y-2 py-1">
+            <div className="flex flex-1 flex-col gap-y-1.5 py-1">
               <label htmlFor="lastName" className="text-sm">
                 Birth Date
               </label>
-              <input
-                type="text"
-                id="birthDate"
-                {...register('birthDate')}
-                className="border border-gray-200 p-2 rounded-md font-light text-sm"
+              <Controller
+                control={control}
+                name="birthDate"
+                rules={{
+                  required: 'Birth date is required',
+                }}
+                render={({ field: { value, ...fieldProps } }) => {
+                  return (
+                    <div>
+                      <ReactDatePicker
+                        {...fieldProps}
+                        className={cx(
+                          errors.birthDate
+                            ? 'border-red-600'
+                            : 'border-gray-200',
+                          'border p-2 rounded-md field-input font-light text-sm outline-blue-400 w-full'
+                        )}
+                        placeholderText="Select date"
+                        selected={value}
+                        dateFormat="yyyy/MM/dd"
+                        showMonthDropdown
+                        maxDate={new Date()}
+                        showYearDropdown
+                        dropdownMode="select"
+                      />
+                    </div>
+                  );
+                }}
               />
+              <p
+                className={cx(
+                  'text-[10px] font-light text-red-600',
+                  errors.birthDate ? 'opacity-100' : 'opacity-0'
+                )}
+              >
+                {errors.birthDate?.message}
+              </p>
             </div>
             {/* ABOUT */}
             <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
@@ -116,11 +208,12 @@ function CreateUserModal({
               <textarea
                 id="about"
                 {...register('about')}
-                className="border border-gray-200 p-2 rounded-md font-light text-sm"
+                rows={6}
+                placeholder="A few words that describe you"
+                className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
               />
             </div>
-            {/*  */}
-
+            {/* CTA */}
             <div className="flex gap-x-2 pt-4 pb-1">
               <button
                 type="button"
@@ -131,9 +224,15 @@ function CreateUserModal({
               </button>
               <button
                 type="submit"
-                className="bg-blue-400 flex-1 hover:bg-blue-600 text-white rounded-md text-sm font-semibold py-2 px-4"
+                className={cx(
+                  isValid
+                    ? 'bg-blue-400  hover:bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-300',
+                  ' flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center'
+                )}
+                disabled={!isValid}
               >
-                Submit
+                {isLoading ? <LoadingSpinner /> : 'Submit'}
               </button>
             </div>
           </form>

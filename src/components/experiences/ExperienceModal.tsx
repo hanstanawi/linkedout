@@ -1,8 +1,11 @@
+import cx from 'classnames';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 import Modal from 'components/modals/Modal';
+import LoadingSpinner from 'components/layout/LoadingSpinner';
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { createExperience, updateExperience } from 'app/slices/users.slice';
+import { useState } from 'react';
 
 type ExperienceModalProps = {
   isOpen: boolean;
@@ -19,12 +22,19 @@ function ExperienceModal({
   experience,
   userId,
 }: ExperienceModalProps) {
+  const [isLoading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
-  const { register, handleSubmit, reset, setValue, watch } =
-    useForm<IExperienceDto>({
-      mode: 'onBlur',
-      defaultValues: mode === 'update' && experience ? experience : undefined,
-    });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<IExperienceDto>({
+    mode: 'onBlur',
+    defaultValues: mode === 'update' && experience ? experience : undefined,
+  });
 
   const { isCurrent } = watch();
 
@@ -32,6 +42,7 @@ function ExperienceModal({
     data
   ) => {
     try {
+      setLoading(true);
       await dispatch(
         createExperience({ ...data, companyLogo: null, userId })
       ).unwrap();
@@ -39,6 +50,8 @@ function ExperienceModal({
       setOpen(false);
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,6 +60,7 @@ function ExperienceModal({
   ) => {
     if (experience) {
       try {
+        setLoading(true);
         await dispatch(
           updateExperience({
             ...data,
@@ -59,6 +73,8 @@ function ExperienceModal({
         setOpen(false);
       } catch (err) {
         console.log(err);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -76,7 +92,7 @@ function ExperienceModal({
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>
       <div className="w-full">
-        <h3 className="font-semibold text-2xl pb-2">{modalTitle}</h3>
+        <h3 className="font-semibold text-xl pb-2">{modalTitle}</h3>
         <hr />
         <section>
           <form
@@ -94,8 +110,20 @@ function ExperienceModal({
                 {...register('jobTitle', {
                   required: 'Job title is required',
                 })}
-                className="border border-gray-200 p-2 rounded-md font-light text-sm"
+                placeholder="Job Title"
+                className={cx(
+                  errors.jobTitle ? 'border-red-600' : 'border-gray-200',
+                  'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
+                )}
               />
+              <p
+                className={cx(
+                  'text-[10px] font-light text-red-600',
+                  errors.jobTitle ? 'opacity-100' : 'opacity-0'
+                )}
+              >
+                {errors.jobTitle?.message}
+              </p>
             </div>
             {/* COMPANY NAME */}
             <div className="flex flex-1 flex-col gap-y-2 py-1">
@@ -108,8 +136,19 @@ function ExperienceModal({
                 {...register('companyName', {
                   required: 'Company name is required',
                 })}
-                className="border border-gray-200 p-2 rounded-md font-light text-sm"
+                className={cx(
+                  errors.companyName ? 'border-red-600' : 'border-gray-200',
+                  'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
+                )}
               />
+              <p
+                className={cx(
+                  'text-[10px] font-light text-red-600',
+                  errors.companyName ? 'opacity-100' : 'opacity-0'
+                )}
+              >
+                {errors.companyName?.message}
+              </p>
             </div>
             {/* PERIOD */}
             <div className="flex gap-x-4 w-full py-1">
@@ -143,7 +182,7 @@ function ExperienceModal({
                 />
               </div>
             </div>
-            {/* ABOUT */}
+            {/* JOB DESC */}
             <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
               <label htmlFor="lastName">Job Description</label>
               <textarea
@@ -177,9 +216,15 @@ function ExperienceModal({
               </button>
               <button
                 type="submit"
-                className="bg-blue-400 flex-1 hover:bg-blue-600 text-white rounded-md text-sm font-semibold py-2 px-4"
+                className={cx(
+                  isValid
+                    ? 'bg-blue-400  hover:bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-300',
+                  ' flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center'
+                )}
+                disabled={!isValid}
               >
-                Submit
+                {isLoading ? <LoadingSpinner /> : 'Submit'}
               </button>
             </div>
           </form>
