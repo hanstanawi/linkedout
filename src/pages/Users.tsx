@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FaUserPlus } from 'react-icons/fa';
 import CreateUserModal from 'components/users/CreateUserModal';
 import UserCard from 'components/users/UserCard';
 import { useAppSelector } from 'hooks/useAppSelector';
@@ -40,12 +41,14 @@ function UsersPage() {
     <>
       <section className="container mx-auto h-full">
         <div className="flex justify-between py-6 items-center">
-          <h3 className="font-semibold text-2xl">Our Team</h3>
+          <h3 className="font-semibold text-2xl">Our Members</h3>
           <button
             type="button"
-            className="bg-blue-400 hover:bg-blue-600 text-white rounded-md text-sm font-semibold py-2 px-4"
+            className="bg-blue-400 hover:bg-blue-600 text-white 
+            rounded-md text-sm font-semibold py-2 px-4 flex items-center gap-x-1"
             onClick={() => setIsModalOpen(true)}
           >
+            <FaUserPlus />
             Add Member
           </button>
         </div>

@@ -1,7 +1,9 @@
+import { useState } from 'react';
+import { FaUserEdit } from 'react-icons/fa';
+
 import placeholder from 'assets/profile-placeholder.png';
 import CreateUserModal from 'components/users/CreateUserModal';
 import { formatBirthDateAsAge } from 'helpers/format.helpers';
-import { useState } from 'react';
 
 type ProfileHeaderProps = {
   user: IUser;
@@ -17,7 +19,7 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
 
   return (
     <>
-      <section className="flex flex-col flex-shrink justify-center items-center w-1/3 mx-auto bg-white px-20 py-8 h-3/4 rounded-md">
+      <section className="flex flex-col flex-shrink justify-center items-center w-1/3 mx-auto bg-white px-20 py-8 h-3/4 rounded-md shadow-md">
         <div className="flex flex-col items-center gap-y-2">
           <img
             className="inline-block h-20 w-20 object-cover rounded-full"
@@ -30,8 +32,10 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
             <button
               type="button"
               onClick={() => openModalHandler(true)}
-              className="bg-blue-400 hover:bg-blue-600 text-white rounded-md text-sm font-semibold py-2 px-4"
+              className="bg-blue-400 hover:bg-blue-600 text-white 
+              rounded-md text-sm font-semibold py-2 px-4 flex items-center gap-x-1"
             >
+              <FaUserEdit />
               Edit Profile
             </button>
           </div>
