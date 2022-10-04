@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { FaTrashAlt, FaPen } from 'react-icons/fa';
-import placeholder from 'assets/profile-placeholder.png';
+import { FaTrashAlt, FaPen, FaSuitcase } from 'react-icons/fa';
 import { formatDate } from 'helpers/format.helpers';
-import { useAppDispatch } from 'hooks/useAppDispatch';
-import { deleteExperience } from 'app/slices/users.slice';
+
 import UpdateExperience from './UpdateExperience';
+import DeleteExperience from './DeleteExperience';
 
 type ExperienceItemProps = {
   experience: IExperience;
@@ -13,15 +12,7 @@ type ExperienceItemProps = {
 
 function ExperienceItem({ experience, userId }: ExperienceItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const dispatch = useAppDispatch();
-
-  const deleteExperienceHandler = async () => {
-    try {
-      await dispatch(deleteExperience(experience)).unwrap();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const [isConfirmDelete, setIsConfirmDelete] = useState(false);
 
   const checkEndDate = () => {
     if (experience.isCurrent && !experience.endDate) {
@@ -36,15 +27,25 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
     setIsModalOpen(state);
   };
 
+  const openConfirmDeleteHandler = (state: boolean) => {
+    setIsConfirmDelete(state);
+  };
+
   return (
     <>
       <li className="w-full flex justify-between gap-x-4">
         <div className="flex-shrink-0">
-          <img
-            className="inline-block h-16 w-16 object-cover rounded-full"
-            src={experience.companyLogo || placeholder}
-            alt="profile"
-          />
+          {experience.companyLogo ? (
+            <img
+              className="inline-block h-16 w-16 object-cover rounded-full"
+              src={experience.companyLogo}
+              alt="profile"
+            />
+          ) : (
+            <div className="h-16 w-16 rounded-full bg-gray-100  flex justify-center items-center">
+              <FaSuitcase size={40} color="rgb(75 85 99)" />
+            </div>
+          )}
         </div>
         <div className="flex-1">
           <div className="flex justify-between items-center">
@@ -59,7 +60,7 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
               </button>
               <button
                 type="button"
-                onClick={deleteExperienceHandler}
+                onClick={() => setIsConfirmDelete(true)}
                 className="bg-transparent py-1 px-3"
               >
                 <FaTrashAlt color="rgb(220 38 38)" />
@@ -71,6 +72,13 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
           <p className="text-sm">{experience.jobDescription}</p>
         </div>
       </li>
+      {isConfirmDelete && (
+        <DeleteExperience
+          experience={experience}
+          isOpen={isConfirmDelete}
+          setOpen={openConfirmDeleteHandler}
+        />
+      )}
       {isModalOpen && (
         <UpdateExperience
           userId={userId}

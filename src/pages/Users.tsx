@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaUserPlus } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import CreateUser from 'components/users/CreateUser';
@@ -9,6 +9,8 @@ import {
   getUsersError,
   getUsersStatus,
 } from 'app/slices/users.slice';
+import LoadingSpinner from 'components/layout/LoadingSpinner';
+import moment from 'moment';
 
 function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,20 +28,35 @@ function UsersPage() {
     setIsModalOpen(state);
   };
 
+  const sortedUsers = useMemo(() => {
+    return [...users].sort((a, b) => {
+      return moment(b.createdAt).diff(moment(a.createdAt));
+    });
+  }, [users]);
+
   let content;
 
   if (requestStatus === 'loading') {
     content = (
       <div className="flex justify-center items-center h-96">
-        <p>Loading...</p>
+        <LoadingSpinner color="rgb(96 165 250)" size={60} />
       </div>
     );
-  } else if (requestStatus === 'succeeded' && users.length) {
+  } else if (requestStatus === 'succeeded' && sortedUsers.length) {
     content = (
       <div className="flex lg:flex-row flex-col lg:items-start items-center lg:gap-x-8 gap-y-8 flex-wrap">
-        {users.map((user) => (
+        {sortedUsers.map((user) => (
           <UserCard key={user.id} user={user} />
         ))}
+      </div>
+    );
+  } else if (requestStatus === 'succeeded' && !sortedUsers.length) {
+    content = (
+      <div className="h-96 flex flex-col justify-center items-center w-full gap-y-1">
+        <h3 className="text-lg font-semibold">No Members</h3>
+        <p className="text-sm font-light">
+          Click Add Member to add your profile
+        </p>
       </div>
     );
   }
@@ -48,7 +65,7 @@ function UsersPage() {
     <>
       <section className="container mx-auto h-full">
         <div className="flex justify-between py-6 items-center">
-          <h3 className="font-semibold text-2xl">Our Members</h3>
+          <h3 className="font-semibold text-2xl text-gray-800">Our Members</h3>
           <button
             type="button"
             className="bg-blue-400 hover:bg-blue-600 text-white 

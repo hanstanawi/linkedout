@@ -28,7 +28,7 @@ export function formatCurrentExperience(user: IUser): string {
     );
     if (currentExperiences.length) {
       const sortedExperiences = currentExperiences.sort((a, b) => {
-        return moment(a.startDate).diff(moment(b.startDate));
+        return moment(b.startDate).diff(moment(a.startDate));
       });
       const [latestExperience] = sortedExperiences;
       return `${latestExperience.jobTitle} at ${latestExperience.companyName}`;

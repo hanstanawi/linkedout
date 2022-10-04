@@ -79,7 +79,6 @@ function UpdateExperience({
         // removing local storage data if updating different experience
         localStorage.removeItem(FORM_DATA_KEY);
       } catch (err) {
-        console.log(err);
         return defaultExperienceValue;
       }
     }
@@ -188,12 +187,20 @@ function UpdateExperience({
           >
             <div className="h-[27rem] overflow-y-auto">
               {companyLogo && companyLogo.length ? (
-                <div className="flex justify-center py-3">
+                <div className="flex flex-col items-center justify-center py-3">
                   <img
                     src={companyLogo || placeholder}
                     alt="profile"
                     className="inline-block h-20 w-20 object-cover rounded-full"
                   />
+                  <button
+                    type="button"
+                    className=" bg-blue-400  hover:bg-blue-600 text-white rounded-sm 
+                    text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
+                    onClick={() => setValue('companyLogo', null)}
+                  >
+                    Remove
+                  </button>
                 </div>
               ) : null}
               {/* JOB TITLE */}
@@ -388,6 +395,7 @@ function UpdateExperience({
                   id="about"
                   {...register('jobDescription')}
                   rows={6}
+                  placeholder="A few words about your job"
                   className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
                 />
               </div>
@@ -414,7 +422,8 @@ function UpdateExperience({
               <button
                 type="button"
                 onClick={closeModalHandler}
-                className="bg-gray-100 flex-1 hover:bg-gray-300 text-black rounded-md text-sm font-semibold py-2 px-4"
+                className="border border-gray-300 bg-white flex-1 hover:bg-gray-50 text-gray-700 
+                rounded-md text-sm font-semibold py-2 px-4"
               >
                 Cancel
               </button>
