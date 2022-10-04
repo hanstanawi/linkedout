@@ -1,22 +1,19 @@
+import cx from 'classnames';
+import ReactDatePicker from 'react-datepicker';
 import { useState } from 'react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import ReactDatePicker from 'react-datepicker';
-import cx from 'classnames';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/layout/LoadingSpinner';
 
 import { useAppDispatch } from 'hooks/useAppDispatch';
-import { createUser, updateUser } from 'app/slices/users.slice';
-import moment from 'moment';
+import { createUser } from 'app/slices/users.slice';
 
-type CreateUserModalProps = {
+type CreateUserProps = {
   isOpen: boolean;
   setOpen: (state: boolean) => void;
-  mode: 'update' | 'create';
-  user: IUser | null;
 };
 
 type FormValues = {
@@ -27,12 +24,7 @@ type FormValues = {
   profileImage: string | null;
 };
 
-function CreateUserModal({
-  isOpen,
-  setOpen,
-  mode,
-  user,
-}: CreateUserModalProps) {
+function CreateUser({ isOpen, setOpen }: CreateUserProps) {
   const [isLoading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -44,10 +36,6 @@ function CreateUserModal({
     formState: { errors },
   } = useForm<FormValues>({
     mode: 'onSubmit',
-    defaultValues:
-      mode === 'update' && user
-        ? { ...user, birthDate: new Date(user.birthDate) }
-        : undefined,
   });
 
   const createUserHandler: SubmitHandler<FormValues> = async (data) => {
@@ -73,49 +61,19 @@ function CreateUserModal({
     }
   };
 
-  const updateUserHandler: SubmitHandler<FormValues> = async (data) => {
-    if (user) {
-      try {
-        setLoading(true);
-
-        const userBody = {
-          ...data,
-          profileImage: null, // fix this
-          id: user.id,
-          birthDate: moment(data.birthDate).format('YYYY-MM-DD'),
-        };
-
-        await dispatch(updateUser(userBody)).unwrap();
-        reset();
-        setOpen(false);
-        toast.success('User updated');
-      } catch (err: any) {
-        console.error(err);
-        toast.error(`Something wrong happened! ${err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
   const closeModalHandler = () => {
     setOpen(false);
     reset();
   };
 
-  const modalTitle = mode === 'create' ? 'Add New Member' : 'Update Profile';
-
-  const submitHandler =
-    mode === 'create' ? createUserHandler : updateUserHandler;
-
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>
       <div className="w-full">
-        <h3 className="font-semibold text-xl pb-2">{modalTitle}</h3>
+        <h3 className="font-semibold text-xl pb-2">Add New Member</h3>
         <hr />
         <section>
           <form
-            onSubmit={handleSubmit(submitHandler)}
+            onSubmit={handleSubmit(createUserHandler)}
             className="flex flex-col gap-y-2 px-2 py-2"
           >
             {/* USER NAME */}
@@ -216,12 +174,22 @@ function CreateUserModal({
             </div>
             {/* ABOUT */}
             <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
+              <label htmlFor="lastName">Profile Image</label>
+              <input
+                id="profileImage"
+                {...register('profileImage')}
+                type="file"
+                className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
+              />
+            </div>
+            {/* ABOUT */}
+            <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
               <label htmlFor="lastName">About you</label>
               <textarea
                 id="about"
                 {...register('about')}
                 rows={6}
-                placeholder="A few words that describe you"
+                placeholder="A few words to describe you"
                 className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
               />
             </div>
@@ -249,4 +217,4 @@ function CreateUserModal({
   );
 }
 
-export default CreateUserModal;
+export default CreateUser;

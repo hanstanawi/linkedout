@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { FaTrashAlt, FaPen } from 'react-icons/fa';
 import placeholder from 'assets/profile-placeholder.png';
 import { formatDate } from 'helpers/format.helpers';
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { deleteExperience } from 'app/slices/users.slice';
-import ExperienceModal from './ExperienceModal';
+import ExperienceModal from './CreateExperience';
+import UpdateExperience from './UpdateExperience';
 
 type ExperienceItemProps = {
   experience: IExperience;
@@ -37,44 +39,47 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
 
   return (
     <>
-      <li className="w-full flex gap-x-4">
-        <div className="">
+      <li className="w-full flex justify-between gap-x-4">
+        <div className="flex-shrink-0">
           <img
-            className="inline-block h-20 w-20 object-cover rounded-full"
+            className="inline-block h-16 w-16 object-cover rounded-full"
             src={experience.companyLogo || placeholder}
             alt="profile"
           />
         </div>
-        <div>
-          <h3 className="text-lg font-semibold">{experience.jobTitle}</h3>
+        <div className="flex-1">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">{experience.jobTitle}</h3>
+            <div className="flex items-start">
+              <button
+                type="button"
+                onClick={() => openModalHandler(true)}
+                className="bg-transparent py-1 px-3"
+              >
+                <FaPen color="rgb(107 114 128)" />
+              </button>
+              <button
+                type="button"
+                onClick={deleteExperienceHandler}
+                className="bg-transparent py-1 px-3"
+              >
+                <FaTrashAlt color="rgb(220 38 38)" />
+              </button>
+            </div>
+          </div>
           <h4 className="text-base">{experience.companyName}</h4>
           <p className="text-gray-400 font-light text-sm py-1">{`${startDate} - ${endDate}`}</p>
           <p className="text-sm">{experience.jobDescription}</p>
         </div>
-        <div className="flex ">
-          <button
-            type="button"
-            onClick={() => openModalHandler(true)}
-            className="bg-blue-400 hover:bg-blue-600 text-white rounded-md text-sm font-semibold py-2 px-4"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={deleteExperienceHandler}
-            className="bg-red-600 hover:bg-red-800 text-white rounded-md text-sm font-semibold py-2 px-4"
-          >
-            Delete
-          </button>
-        </div>
       </li>
-      <ExperienceModal
-        userId={userId}
-        isOpen={isModalOpen}
-        setOpen={openModalHandler}
-        mode="update"
-        experience={experience}
-      />
+      {isModalOpen && (
+        <UpdateExperience
+          userId={userId}
+          isOpen={isModalOpen}
+          setOpen={openModalHandler}
+          experience={experience}
+        />
+      )}
     </>
   );
 }

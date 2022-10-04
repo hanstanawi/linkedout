@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import ExperienceItem from './ExperienceItem';
-import ExperienceModal from './ExperienceModal';
+import CreateExperience from './CreateExperience';
 
 type ExperiencesListProps = {
   userId: string;
@@ -17,7 +17,7 @@ function ExperiencesList({ experiences, userId }: ExperiencesListProps) {
 
   return (
     <>
-      <section className="flex flex-col gap-y-6 justify-center items-center w-3/4 h-full mx-auto bg-white px-6 py-8 rounded-md shadow-md">
+      <section className="flex flex-col gap-y-6 justify-center items-center w-3/4 h-[80vh] mx-auto bg-white p-6 rounded-md shadow-md">
         <div className="flex justify-between w-full items-center">
           <h4 className="text-2xl font-semibold">Experience</h4>
           <button
@@ -29,7 +29,7 @@ function ExperiencesList({ experiences, userId }: ExperiencesListProps) {
             Add Experience
           </button>
         </div>
-        <ul className="flex flex-col w-full gap-y-4 h-3/4 overflow-y-auto">
+        <ul className="flex flex-col w-full gap-y-4 p-4 h-full overflow-y-auto">
           {experiences.map((experience, i) => (
             <>
               {/* TODO: FIX THIS */}
@@ -44,12 +44,10 @@ function ExperiencesList({ experiences, userId }: ExperiencesListProps) {
         </ul>
       </section>
       {isModalOpen && (
-        <ExperienceModal
+        <CreateExperience
           userId={userId}
           isOpen={isModalOpen}
           setOpen={openModalHandler}
-          mode="create"
-          experience={null}
         />
       )}
     </>
