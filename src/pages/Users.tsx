@@ -9,6 +9,7 @@ import {
   getUsersError,
   getUsersStatus,
 } from 'app/slices/users.slice';
+import LoadingSpinner from 'components/layout/LoadingSpinner';
 
 function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,7 +32,7 @@ function UsersPage() {
   if (requestStatus === 'loading') {
     content = (
       <div className="flex justify-center items-center h-96">
-        <p>Loading...</p>
+        <LoadingSpinner color="rgb(96 165 250)" size={60} />
       </div>
     );
   } else if (requestStatus === 'succeeded' && users.length) {
