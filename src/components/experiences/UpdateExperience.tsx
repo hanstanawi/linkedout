@@ -395,6 +395,7 @@ function UpdateExperience({
                   id="about"
                   {...register('jobDescription')}
                   rows={6}
+                  placeholder="A few words about your job"
                   className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
                 />
               </div>
