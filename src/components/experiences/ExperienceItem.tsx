@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { FaTrashAlt, FaPen } from 'react-icons/fa';
 import placeholder from 'assets/profile-placeholder.png';
 import { formatDate } from 'helpers/format.helpers';
-import { useAppDispatch } from 'hooks/useAppDispatch';
-import { deleteExperience } from 'app/slices/users.slice';
+
 import UpdateExperience from './UpdateExperience';
+import DeleteExperience from './DeleteExperience';
 
 type ExperienceItemProps = {
   experience: IExperience;
@@ -13,15 +13,7 @@ type ExperienceItemProps = {
 
 function ExperienceItem({ experience, userId }: ExperienceItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const dispatch = useAppDispatch();
-
-  const deleteExperienceHandler = async () => {
-    try {
-      await dispatch(deleteExperience(experience)).unwrap();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const [isConfirmDelete, setIsConfirmDelete] = useState(false);
 
   const checkEndDate = () => {
     if (experience.isCurrent && !experience.endDate) {
@@ -34,6 +26,10 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
 
   const openModalHandler = (state: boolean) => {
     setIsModalOpen(state);
+  };
+
+  const openConfirmDeleteHandler = (state: boolean) => {
+    setIsConfirmDelete(state);
   };
 
   return (
@@ -59,7 +55,7 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
               </button>
               <button
                 type="button"
-                onClick={deleteExperienceHandler}
+                onClick={() => setIsConfirmDelete(true)}
                 className="bg-transparent py-1 px-3"
               >
                 <FaTrashAlt color="rgb(220 38 38)" />
@@ -71,6 +67,13 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
           <p className="text-sm">{experience.jobDescription}</p>
         </div>
       </li>
+      {isConfirmDelete && (
+        <DeleteExperience
+          experience={experience}
+          isOpen={isConfirmDelete}
+          setOpen={openConfirmDeleteHandler}
+        />
+      )}
       {isModalOpen && (
         <UpdateExperience
           userId={userId}
