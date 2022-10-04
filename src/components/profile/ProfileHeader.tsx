@@ -2,16 +2,21 @@ import { useState } from 'react';
 import { FaUserEdit } from 'react-icons/fa';
 
 import placeholder from 'assets/profile-placeholder.png';
-import CreateUserModal from 'components/users/CreateUserModal';
-import { formatBirthDateAsAge } from 'helpers/format.helpers';
+import UpdateUser from 'components/users/UpdateUser';
+import {
+  formatBirthDateAsAge,
+  formatCurrentExperience,
+} from 'helpers/format.helpers';
 
 type ProfileHeaderProps = {
   user: IUser;
 };
 
 function ProfileHeader({ user }: ProfileHeaderProps) {
-  const userAge = formatBirthDateAsAge(user.birthDate);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const userAge = formatBirthDateAsAge(user.birthDate);
+  const currentJob = formatCurrentExperience(user);
 
   const openModalHandler = (state: boolean) => {
     setIsModalOpen(state);
@@ -27,7 +32,7 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
             alt="profile"
           />
           <h2 className="text-2xl font-semibold">{`${user.firstName} ${user.lastName}, ${userAge}`}</h2>
-          <p>{user.about}</p>
+          <p className="text-gray-400 font-light">{currentJob}</p>
           <div>
             <button
               type="button"
@@ -42,10 +47,9 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
         </div>
       </section>
       {isModalOpen && (
-        <CreateUserModal
+        <UpdateUser
           isOpen={isModalOpen}
           setOpen={openModalHandler}
-          mode="update"
           user={user}
         />
       )}
