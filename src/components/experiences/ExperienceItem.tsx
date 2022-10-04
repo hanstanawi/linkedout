@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { FaTrashAlt, FaPen } from 'react-icons/fa';
-import placeholder from 'assets/profile-placeholder.png';
+import { FaTrashAlt, FaPen, FaSuitcase } from 'react-icons/fa';
 import { formatDate } from 'helpers/format.helpers';
 
 import UpdateExperience from './UpdateExperience';
@@ -36,11 +35,17 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
     <>
       <li className="w-full flex justify-between gap-x-4">
         <div className="flex-shrink-0">
-          <img
-            className="inline-block h-16 w-16 object-cover rounded-full"
-            src={experience.companyLogo || placeholder}
-            alt="profile"
-          />
+          {experience.companyLogo ? (
+            <img
+              className="inline-block h-16 w-16 object-cover rounded-full"
+              src={experience.companyLogo}
+              alt="profile"
+            />
+          ) : (
+            <div className="h-16 w-16 rounded-full bg-gray-100  flex justify-center items-center">
+              <FaSuitcase size={40} color="rgb(75 85 99)" />
+            </div>
+          )}
         </div>
         <div className="flex-1">
           <div className="flex justify-between items-center">
