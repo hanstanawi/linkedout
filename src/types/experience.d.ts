@@ -4,7 +4,7 @@ interface IExperienceDto {
   endDate: string | null;
   companyName: string;
   companyLogo: string | null;
-  jobDescription: string;
+  jobDescription: string | null;
   isCurrent: boolean;
   userId: string;
 }

@@ -20,3 +20,19 @@ export function formatDate(date: string): string {
   const momentDate = moment(date);
   return momentDate.format('MMM YYYY');
 }
+
+export function formatCurrentExperience(user: IUser): string {
+  if (user.workExperiences.length) {
+    const currentExperiences = user.workExperiences.filter(
+      (experience) => experience.isCurrent
+    );
+    if (currentExperiences.length) {
+      const sortedExperiences = currentExperiences.sort((a, b) => {
+        return moment(a.startDate).diff(moment(b.startDate));
+      });
+      const [latestExperience] = sortedExperiences;
+      return `${latestExperience.jobTitle} at ${latestExperience.companyName}`;
+    }
+  }
+  return '-';
+}
