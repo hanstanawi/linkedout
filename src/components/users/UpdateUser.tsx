@@ -1,16 +1,17 @@
 import cx from 'classnames';
 import moment from 'moment';
 import ReactDatePicker from 'react-datepicker';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/layout/LoadingSpinner';
+import placeholder from 'assets/profile-placeholder.png';
 
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { updateUser } from 'app/slices/users.slice';
+import * as cloudinaryApi from 'api/cloudinary.api';
 
 type UpdateUserModalProps = {
   isOpen: boolean;
@@ -28,18 +29,44 @@ type FormValues = {
 
 function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
   const [isLoading, setLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const {
     control,
     register,
     handleSubmit,
     reset,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm<FormValues>({
     mode: 'onSubmit',
     defaultValues: { ...user, birthDate: new Date(user.birthDate) },
   });
+
+  const profileImage = getValues('profileImage');
+
+  const changeFileHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (files) {
+      setImage(files[0]);
+    }
+  };
+
+  const uploadImageHandler = async () => {
+    if (image) {
+      try {
+        setIsUploading(true);
+        const uploadedImage = await cloudinaryApi.uploadImage(image);
+        setValue('profileImage', uploadedImage.url);
+      } catch (err: any) {
+        toast.error(`Upload failed ${err.message}`);
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
 
   const updateUserHandler: SubmitHandler<FormValues> = async (data) => {
     if (user) {
@@ -48,7 +75,6 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
 
         const userBody = {
           ...data,
-          profileImage: null, // fix this
           id: user.id,
           birthDate: moment(data.birthDate).format('YYYY-MM-DD'),
         };
@@ -77,6 +103,16 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
         <h3 className="font-semibold text-xl pb-2">Update Profile</h3>
         <hr />
         <section>
+          <div className="flex justify-center py-2">
+            {profileImage && profileImage.length ? (
+              <img
+                src={profileImage || placeholder}
+                alt="profile"
+                className="inline-block h-20 w-20 object-cover rounded-full"
+              />
+            ) : null}
+          </div>
+
           <form
             onSubmit={handleSubmit(updateUserHandler)}
             className="flex flex-col gap-y-2 px-2 py-2"
@@ -134,6 +170,7 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
                 </p>
               </div>
             </div>
+
             {/* BIRTH DATE */}
             <div className="flex flex-1 flex-col gap-y-1.5 py-1">
               <label htmlFor="lastName" className="text-sm">
@@ -177,27 +214,40 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
                 {errors.birthDate?.message}
               </p>
             </div>
-            {/* ABOUT */}
+
+            {/* PROFILE IMAGE */}
             <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
               <label htmlFor="lastName">Profile Image</label>
-              <input
-                id="profileImage"
-                {...register('profileImage')}
-                type="file"
-                className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
-              />
+              <div className="flex items-center gap-x-2">
+                <input
+                  id="profileImage"
+                  type="file"
+                  onChange={changeFileHandler}
+                  className="border border-gray-200 flex-1 p-2 rounded-md font-light text-xs outline-blue-400"
+                />
+                <button
+                  type="button"
+                  onClick={uploadImageHandler}
+                  className=" bg-blue-400  hover:bg-blue-600 text-white
+                  flex-shrink-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
+                >
+                  {isUploading ? <LoadingSpinner /> : 'Upload'}
+                </button>
+              </div>
             </div>
+
             {/* ABOUT */}
             <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
               <label htmlFor="lastName">About you</label>
               <textarea
                 id="about"
                 {...register('about')}
-                rows={6}
+                rows={3}
                 placeholder="A few words to describe you"
                 className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
               />
             </div>
+
             {/* CTA */}
             <div className="flex gap-x-2 pt-4 pb-1">
               <button
