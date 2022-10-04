@@ -2,16 +2,20 @@ import moment from 'moment';
 import cx from 'classnames';
 import ReactDatePicker from 'react-datepicker';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/layout/LoadingSpinner';
+import placeholder from 'assets/profile-placeholder.png';
+
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { updateExperience } from 'app/slices/users.slice';
+import * as cloudinaryApi from 'api/cloudinary.api';
+import { usePersistForm } from 'hooks/usePersistForm';
 
-type UpdateExeperienceProps = {
+type UpdateExperienceProps = {
   isOpen: boolean;
   setOpen: (state: boolean) => void;
   experience: IExperience;
@@ -28,14 +32,60 @@ type FormValues = {
   isCurrent: boolean;
 };
 
+const FORM_DATA_KEY = 'updateExperience';
+
 function UpdateExperience({
   isOpen,
   setOpen,
   experience,
   userId,
-}: UpdateExeperienceProps) {
+}: UpdateExperienceProps) {
   const [isLoading, setLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
   const dispatch = useAppDispatch();
+
+  const defaultExperienceValue = {
+    ...experience,
+    startDate: new Date(experience.startDate),
+    endDate: experience.endDate ? new Date(experience.endDate) : null,
+  };
+
+  const getDataFromLocalStorage = () => {
+    const dataFromLocaleStorage = localStorage.getItem(FORM_DATA_KEY);
+    if (dataFromLocaleStorage) {
+      try {
+        const dataObj = JSON.parse(dataFromLocaleStorage) as FormValues & {
+          id: string;
+        };
+
+        if (dataObj.id === experience.id) {
+          const formattedStartDate = dataObj.startDate
+            ? moment(dataObj.startDate).format('YYYY-MM-DD')
+            : null;
+          const formattedEndDate = dataObj.endDate
+            ? moment(dataObj.endDate).format('YYYY-MM-DD')
+            : null;
+
+          return {
+            ...dataObj,
+            startDate: formattedStartDate
+              ? new Date(formattedStartDate)
+              : new Date(),
+            endDate: formattedEndDate ? new Date(formattedEndDate) : null,
+          };
+        }
+
+        // removing local storage data if updating different experience
+        localStorage.removeItem(FORM_DATA_KEY);
+      } catch (err) {
+        console.log(err);
+        return defaultExperienceValue;
+      }
+    }
+    // return default experience object from props
+    return defaultExperienceValue;
+  };
   const {
     control,
     register,
@@ -48,20 +98,43 @@ function UpdateExperience({
   } = useForm<FormValues>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
-    defaultValues: {
-      ...experience,
-      startDate: new Date(experience.startDate),
-      endDate: experience.endDate ? new Date(experience.endDate) : null,
-    },
+    defaultValues: getDataFromLocalStorage(),
+  });
+
+  usePersistForm({
+    value: { ...watch(), id: experience.id },
+    localStorageKey: FORM_DATA_KEY,
   });
 
   const { isCurrent } = watch();
+  const companyLogo = getValues('companyLogo');
 
   useEffect(() => {
     if (isCurrent) {
       setValue('endDate', null, { shouldValidate: true });
     }
   }, [isCurrent, setValue]);
+
+  const changeFileHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (files) {
+      setImage(files[0]);
+    }
+  };
+
+  const uploadImageHandler = async () => {
+    if (image) {
+      try {
+        setIsUploading(true);
+        const uploadedImage = await cloudinaryApi.uploadImage(image);
+        setValue('companyLogo', uploadedImage.url);
+      } catch (err: any) {
+        toast.error(`Upload failed ${err.message}`);
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
 
   const updateExperienceHandler: SubmitHandler<FormValues> = async (data) => {
     if (experience) {
@@ -71,7 +144,7 @@ function UpdateExperience({
         const experienceBody = {
           ...data,
           id: experience.id,
-          companyLogo: null,
+          companyLogo: data.companyLogo || null,
           startDate: moment(data.startDate).format('YYYY-MM-DD'),
           endDate: data.endDate
             ? moment(data.endDate).format('YYYY-MM-DD')
@@ -84,6 +157,7 @@ function UpdateExperience({
         toast.success('Experience updated!');
         reset();
         setOpen(false);
+        localStorage.removeItem(FORM_DATA_KEY);
       } catch (err: any) {
         console.error(err);
         toast.error(`Something wrong happened! ${err.message}`);
@@ -113,6 +187,15 @@ function UpdateExperience({
             className="flex flex-col gap-y-1 px-2 py-2"
           >
             <div className="h-[27rem] overflow-y-auto">
+              {companyLogo && companyLogo.length ? (
+                <div className="flex justify-center py-3">
+                  <img
+                    src={companyLogo || placeholder}
+                    alt="profile"
+                    className="inline-block h-20 w-20 object-cover rounded-full"
+                  />
+                </div>
+              ) : null}
               {/* JOB TITLE */}
               <div className="flex flex-1 flex-col gap-y-1 py-1">
                 <label htmlFor="lastName" className="text-sm">
@@ -139,6 +222,7 @@ function UpdateExperience({
                   {errors.jobTitle?.message}
                 </p>
               </div>
+
               {/* COMPANY NAME */}
               <div className="flex flex-1 flex-col gap-y-1 py-1">
                 <label htmlFor="lastName" className="text-sm">
@@ -164,6 +248,28 @@ function UpdateExperience({
                   {errors.companyName?.message}
                 </p>
               </div>
+
+              {/* COMPANY LOGO */}
+              <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
+                <label htmlFor="lastName">Company Logo</label>
+                <div className="flex items-center gap-x-2">
+                  <input
+                    id="companyLogo"
+                    type="file"
+                    onChange={changeFileHandler}
+                    className="border border-gray-200 flex-1 p-2 rounded-md font-light text-xs outline-blue-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={uploadImageHandler}
+                    className=" bg-blue-400  hover:bg-blue-600 text-white
+                  flex-shrink-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
+                  >
+                    {isUploading ? <LoadingSpinner /> : 'Upload'}
+                  </button>
+                </div>
+              </div>
+
               {/* PERIOD */}
               <div className="flex gap-x-4 w-full py-1">
                 <div className="flex flex-1 flex-col gap-y-1">
@@ -274,6 +380,7 @@ function UpdateExperience({
                   </p>
                 </div>
               </div>
+
               {/* JOB DESC */}
               <div className="flex flex-1 flex-col gap-y-1 text-sm py-1">
                 <label htmlFor="lastName">Job Description</label>
@@ -284,6 +391,7 @@ function UpdateExperience({
                   className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
                 />
               </div>
+
               {/* CURRENT JOB */}
               <div className="flex items-center my-2.5">
                 <input

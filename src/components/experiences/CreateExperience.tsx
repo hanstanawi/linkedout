@@ -1,15 +1,18 @@
 import moment from 'moment';
 import cx from 'classnames';
 import ReactDatePicker from 'react-datepicker';
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/layout/LoadingSpinner';
+import placeholder from 'assets/profile-placeholder.png';
+
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { createExperience } from 'app/slices/users.slice';
+import * as cloudinaryApi from 'api/cloudinary.api';
+import { usePersistForm } from 'hooks/usePersistForm';
 
 type CreateExperienceProps = {
   isOpen: boolean;
@@ -27,9 +30,46 @@ type FormValues = {
   isCurrent: boolean;
 };
 
+const FORM_DATA_KEY = 'createExperience';
+
 function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
   const [isLoading, setLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
   const dispatch = useAppDispatch();
+
+  const getDataFromLocalStorage = () => {
+    const dataFromLocaleStorage = localStorage.getItem(FORM_DATA_KEY);
+    if (dataFromLocaleStorage) {
+      try {
+        const dataObj = JSON.parse(dataFromLocaleStorage) as FormValues & {
+          userId: string;
+        };
+        if (dataObj.userId === userId) {
+          const formattedStartDate = dataObj.startDate
+            ? moment(dataObj.startDate).format('YYYY-MM-DD')
+            : null;
+          const formattedEndDate = dataObj.endDate
+            ? moment(dataObj.endDate).format('YYYY-MM-DD')
+            : null;
+
+          return {
+            ...dataObj,
+            startDate: formattedStartDate
+              ? new Date(formattedStartDate)
+              : new Date(),
+            endDate: formattedEndDate ? new Date(formattedEndDate) : null,
+          };
+        }
+        localStorage.removeItem(FORM_DATA_KEY);
+      } catch (err) {
+        console.log(err);
+        return undefined;
+      }
+    }
+    return undefined;
+  };
+
   const {
     control,
     register,
@@ -41,9 +81,16 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
     formState: { errors },
   } = useForm<FormValues>({
     mode: 'onSubmit',
+    defaultValues: getDataFromLocalStorage(),
+  });
+
+  usePersistForm({
+    value: { ...watch(), userId },
+    localStorageKey: FORM_DATA_KEY,
   });
 
   const { isCurrent } = watch();
+  const companyLogo = getValues('companyLogo');
 
   useEffect(() => {
     if (isCurrent) {
@@ -51,14 +98,35 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
     }
   }, [isCurrent, setValue]);
 
+  const changeFileHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (files) {
+      setImage(files[0]);
+    }
+  };
+
+  const uploadImageHandler = async () => {
+    if (image) {
+      try {
+        setIsUploading(true);
+        const uploadedImage = await cloudinaryApi.uploadImage(image);
+        setValue('companyLogo', uploadedImage.url);
+      } catch (err: any) {
+        toast.error(`Upload failed ${err.message}`);
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
+
   const createExperienceHandler: SubmitHandler<FormValues> = async (data) => {
     try {
       setLoading(true);
 
       const experienceBody = {
         ...data,
-        companyLogo: null, // fix this
         userId,
+        companyLogo: data.companyLogo || null,
         startDate: moment(data.startDate).format('YYYY-MM-DD'),
         endDate: data.endDate
           ? moment(data.endDate).format('YYYY-MM-DD')
@@ -69,6 +137,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
       toast.success('Experience created!');
       reset();
       setOpen(false);
+      localStorage.removeItem(FORM_DATA_KEY);
     } catch (err: any) {
       console.error(err);
       toast.error(`Something wrong happened! ${err.message}`);
@@ -97,6 +166,15 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
             className="flex flex-col gap-y-1 px-2 py-2"
           >
             <div className="h-[27rem] overflow-y-auto">
+              {companyLogo && companyLogo.length ? (
+                <div className="flex justify-center py-3">
+                  <img
+                    src={companyLogo || placeholder}
+                    alt="profile"
+                    className="inline-block h-20 w-20 object-cover rounded-full"
+                  />
+                </div>
+              ) : null}
               {/* JOB TITLE */}
               <div className="flex flex-1 flex-col gap-y-1 py-1">
                 <label htmlFor="lastName" className="text-sm">
@@ -123,6 +201,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
                   {errors.jobTitle?.message}
                 </p>
               </div>
+
               {/* COMPANY NAME */}
               <div className="flex flex-1 flex-col gap-y-1 py-1">
                 <label htmlFor="lastName" className="text-sm">
@@ -134,6 +213,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
                   {...register('companyName', {
                     required: 'Company name is required',
                   })}
+                  placeholder="Company Name"
                   className={cx(
                     errors.companyName ? 'border-red-600' : 'border-gray-200',
                     'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
@@ -148,6 +228,28 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
                   {errors.companyName?.message}
                 </p>
               </div>
+
+              {/* COMPANY LOGO */}
+              <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
+                <label htmlFor="lastName">Company Logo</label>
+                <div className="flex items-center gap-x-2">
+                  <input
+                    id="companyLogo"
+                    type="file"
+                    onChange={changeFileHandler}
+                    className="border border-gray-200 flex-1 p-2 rounded-md font-light text-xs outline-blue-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={uploadImageHandler}
+                    className=" bg-blue-400  hover:bg-blue-600 text-white
+                  flex-shrink-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
+                  >
+                    {isUploading ? <LoadingSpinner /> : 'Upload'}
+                  </button>
+                </div>
+              </div>
+
               {/* PERIOD */}
               <div className="flex gap-x-4 w-full py-1">
                 <div className="flex flex-1 flex-col gap-y-1">
@@ -258,6 +360,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
                   </p>
                 </div>
               </div>
+
               {/* JOB DESC */}
               <div className="flex flex-1 flex-col gap-y-1 text-sm py-1">
                 <label htmlFor="lastName">Job Description</label>
@@ -275,6 +378,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
                   id="isCurrentJob"
                   className="h-4 w-4 cursor-pointer border-transparent"
                   onClick={setCurrentJob}
+                  placeholder="A few words about your job"
                   {...register('isCurrent')}
                 />
                 <label
@@ -286,6 +390,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
               </div>
             </div>
 
+            {/* CTA */}
             <div className="flex gap-x-2 pt-4 pb-1">
               <button
                 type="button"

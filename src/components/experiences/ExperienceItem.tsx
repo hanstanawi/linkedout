@@ -4,7 +4,6 @@ import placeholder from 'assets/profile-placeholder.png';
 import { formatDate } from 'helpers/format.helpers';
 import { useAppDispatch } from 'hooks/useAppDispatch';
 import { deleteExperience } from 'app/slices/users.slice';
-import ExperienceModal from './CreateExperience';
 import UpdateExperience from './UpdateExperience';
 
 type ExperienceItemProps = {
