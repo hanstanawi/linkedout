@@ -52,7 +52,6 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
           birthDate: new Date(formattedBirthDate),
         };
       } catch (err) {
-        console.log(err);
         return undefined;
       }
     }
