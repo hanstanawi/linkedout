@@ -1,22 +1,18 @@
 import { FaExclamationTriangle } from 'react-icons/fa';
-import { useAppDispatch } from 'hooks/useAppDispatch';
-import { deleteExperience } from 'app/slices/users.slice';
+import { useAppDispatch } from 'hooks/use-app-dispatch';
+import { deleteExperience } from 'features/users/users.slice';
 import Modal from 'components/modals/Modal';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import LoadingSpinner from 'components/layout/LoadingSpinner';
+import LoadingSpinner from 'components/ui/LoadingSpinner';
 
-type DeleteExperienceProps = {
+type ConfirmDeleteProps = {
   experience: IExperience;
   setOpen: (state: boolean) => void;
   isOpen: boolean;
 };
 
-function DeleteExperience({
-  experience,
-  setOpen,
-  isOpen,
-}: DeleteExperienceProps) {
+function ConfirmDelete({ experience, setOpen, isOpen }: ConfirmDeleteProps) {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -73,4 +69,4 @@ function DeleteExperience({
   );
 }
 
-export default DeleteExperience;
+export default ConfirmDelete;

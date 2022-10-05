@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import placeholder from 'assets/profile-placeholder.png';
-import { formatCurrentExperience } from 'helpers/format.helpers';
+import { formatCurrentExperience } from 'features/users/helpers/format.helpers';
 
 type UserCardProps = {
   user: IUser;

@@ -1,24 +1,22 @@
 import moment from 'moment';
 import cx from 'classnames';
 import ReactDatePicker from 'react-datepicker';
-
 import { useEffect, useState, ChangeEvent } from 'react';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
 import Modal from 'components/modals/Modal';
-import LoadingSpinner from 'components/layout/LoadingSpinner';
+import LoadingSpinner from 'components/ui/LoadingSpinner';
 import placeholder from 'assets/profile-placeholder.png';
 
-import { useAppDispatch } from 'hooks/useAppDispatch';
-import { updateExperience } from 'app/slices/users.slice';
 import * as cloudinaryApi from 'api/cloudinary.api';
-import { usePersistForm } from 'hooks/usePersistForm';
+import { useAppDispatch } from 'hooks/use-app-dispatch';
+import { createExperience } from 'features/users/users.slice';
+import { usePersistForm } from 'hooks/use-persist-form';
 
-type UpdateExperienceProps = {
+type CreateExperienceProps = {
   isOpen: boolean;
   setOpen: (state: boolean) => void;
-  experience: IExperience;
   userId: string;
 };
 
@@ -32,34 +30,23 @@ type FormValues = {
   isCurrent: boolean;
 };
 
-const FORM_DATA_KEY = 'updateExperience';
+const FORM_DATA_KEY = 'createExperience';
 
-function UpdateExperience({
-  isOpen,
-  setOpen,
-  experience,
-  userId,
-}: UpdateExperienceProps) {
+function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
   const [isLoading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const dispatch = useAppDispatch();
-
-  const defaultExperienceValue = {
-    ...experience,
-    startDate: new Date(experience.startDate),
-    endDate: experience.endDate ? new Date(experience.endDate) : null,
-  };
 
   const getDataFromLocalStorage = () => {
     const dataFromLocaleStorage = localStorage.getItem(FORM_DATA_KEY);
     if (dataFromLocaleStorage) {
       try {
         const dataObj = JSON.parse(dataFromLocaleStorage) as FormValues & {
-          id: string;
+          userId: string;
         };
-
-        if (dataObj.id === experience.id) {
+        // for the same user, set the data from local storage
+        if (dataObj.userId === userId) {
           const formattedStartDate = dataObj.startDate
             ? moment(dataObj.startDate).format('YYYY-MM-DD')
             : null;
@@ -75,16 +62,14 @@ function UpdateExperience({
             endDate: formattedEndDate ? new Date(formattedEndDate) : null,
           };
         }
-
-        // removing local storage data if updating different experience
         localStorage.removeItem(FORM_DATA_KEY);
       } catch (err) {
-        return defaultExperienceValue;
+        return undefined;
       }
     }
-    // return default experience object from props
-    return defaultExperienceValue;
+    return undefined;
   };
+
   const {
     control,
     register,
@@ -96,12 +81,11 @@ function UpdateExperience({
     formState: { errors },
   } = useForm<FormValues>({
     mode: 'onSubmit',
-    reValidateMode: 'onSubmit',
     defaultValues: getDataFromLocalStorage(),
   });
 
   usePersistForm({
-    value: { ...watch(), id: experience.id },
+    value: { ...watch(), userId },
     localStorageKey: FORM_DATA_KEY,
   });
 
@@ -135,34 +119,30 @@ function UpdateExperience({
     }
   };
 
-  const updateExperienceHandler: SubmitHandler<FormValues> = async (data) => {
-    if (experience) {
-      try {
-        setLoading(true);
+  const createExperienceHandler: SubmitHandler<FormValues> = async (data) => {
+    try {
+      setLoading(true);
 
-        const experienceBody = {
-          ...data,
-          id: experience.id,
-          companyLogo: data.companyLogo || null,
-          startDate: moment(data.startDate).format('YYYY-MM-DD'),
-          endDate: data.endDate
-            ? moment(data.endDate).format('YYYY-MM-DD')
-            : null,
-          userId,
-        };
+      const experienceBody = {
+        ...data,
+        userId,
+        companyLogo: data.companyLogo || null,
+        startDate: moment(data.startDate).format('YYYY-MM-DD'),
+        endDate: data.endDate
+          ? moment(data.endDate).format('YYYY-MM-DD')
+          : null,
+      };
 
-        await dispatch(updateExperience(experienceBody)).unwrap();
-
-        toast.success('Experience updated!');
-        reset();
-        setOpen(false);
-        localStorage.removeItem(FORM_DATA_KEY);
-      } catch (err: any) {
-        console.error(err);
-        toast.error(`Something wrong happened! ${err.message}`);
-      } finally {
-        setLoading(false);
-      }
+      await dispatch(createExperience(experienceBody)).unwrap();
+      toast.success('Experience created!');
+      reset();
+      setOpen(false);
+      localStorage.removeItem(FORM_DATA_KEY);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Something wrong happened! ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -178,11 +158,11 @@ function UpdateExperience({
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>
       <div className="w-full">
-        <h3 className="font-semibold text-xl pb-2">Update Experience</h3>
+        <h3 className="font-semibold text-xl pb-2">Add New Experience</h3>
         <hr />
         <section>
           <form
-            onSubmit={handleSubmit(updateExperienceHandler)}
+            onSubmit={handleSubmit(createExperienceHandler)}
             className="flex flex-col gap-y-1 px-2 py-2"
           >
             <div className="h-[27rem] overflow-y-auto">
@@ -195,8 +175,8 @@ function UpdateExperience({
                   />
                   <button
                     type="button"
-                    className=" bg-blue-400  hover:bg-blue-600 text-white rounded-sm 
-                    text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
+                    className=" bg-blue-400  hover:bg-blue-600 text-white
+              rounded-sm text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
                     onClick={() => setValue('companyLogo', null)}
                   >
                     Remove
@@ -241,6 +221,7 @@ function UpdateExperience({
                   {...register('companyName', {
                     required: 'Company name is required',
                   })}
+                  placeholder="Company Name"
                   className={cx(
                     errors.companyName ? 'border-red-600' : 'border-gray-200',
                     'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
@@ -399,7 +380,6 @@ function UpdateExperience({
                   className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
                 />
               </div>
-
               {/* CURRENT JOB */}
               <div className="flex items-center my-2.5">
                 <input
@@ -418,6 +398,7 @@ function UpdateExperience({
               </div>
             </div>
 
+            {/* CTA */}
             <div className="flex gap-x-2 pt-4 pb-1">
               <button
                 type="button"
@@ -442,4 +423,4 @@ function UpdateExperience({
   );
 }
 
-export default UpdateExperience;
+export default ExperienceModal;

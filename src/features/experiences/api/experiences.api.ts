@@ -1,4 +1,4 @@
-import axiosInstance from './axiosInstance';
+import axiosInstance from 'api/axiosInstance';
 
 export async function getExperience(
   experienceId: string

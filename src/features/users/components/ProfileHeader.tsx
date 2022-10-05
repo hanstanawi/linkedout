@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { FaUserEdit } from 'react-icons/fa';
 
 import placeholder from 'assets/profile-placeholder.png';
-import UpdateUser from 'components/users/UpdateUser';
+import UpdateUser from 'features/users/components/modals/UpdateUser';
 import {
   formatBirthDateAsAge,
   formatCurrentExperience,
-} from 'helpers/format.helpers';
+} from 'features/users/helpers/format.helpers';
 
 type ProfileHeaderProps = {
   user: IUser;

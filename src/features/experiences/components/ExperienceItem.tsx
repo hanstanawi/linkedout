@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { FaTrashAlt, FaPen, FaSuitcase } from 'react-icons/fa';
-import { formatDate } from 'helpers/format.helpers';
+import { formatDate } from 'features/users/helpers/format.helpers';
 
-import UpdateExperience from './UpdateExperience';
-import DeleteExperience from './DeleteExperience';
+import UpdateExperience from './modals/UpdateExperience';
+import DeleteExperience from './modals/ConfirmDelete';
 
 type ExperienceItemProps = {
   experience: IExperience;

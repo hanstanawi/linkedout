@@ -1,4 +1,4 @@
-import axiosInstance from './axiosInstance';
+import axiosInstance from '../../../api/axiosInstance';
 
 export async function getAllUsers(): Promise<IUser[]> {
   const res = await axiosInstance.get<IUser[]>('/users');

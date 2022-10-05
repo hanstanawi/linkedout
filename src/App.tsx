@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import Layout from 'components/layout/Layout';
-import UserProfile from 'pages/UserProfile';
-import Users from 'pages/Users';
+import UserProfile from 'features/users/pages/UserProfile';
+import Users from 'features/users/pages/Users';
 import NotFound from 'pages/NotFound';
-import { useAppDispatch } from 'hooks/useAppDispatch';
-import { fetchUsers } from 'app/slices/users.slice';
+import { useAppDispatch } from 'hooks/use-app-dispatch';
+import { fetchUsers } from 'features/users/users.slice';
 
 function App() {
   const dispatch = useAppDispatch();
