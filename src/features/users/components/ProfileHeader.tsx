@@ -7,6 +7,7 @@ import {
   formatBirthDateAsAge,
   formatCurrentExperience,
 } from 'features/users/helpers/format.helpers';
+import Button from 'components/ui/Button';
 
 type ProfileHeaderProps = {
   user: IUser;
@@ -34,15 +35,10 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
           <h2 className="text-2xl font-semibold">{`${user.firstName} ${user.lastName}, ${userAge}`}</h2>
           <p className="text-gray-400 font-light">{currentJob}</p>
           <div>
-            <button
-              type="button"
-              onClick={() => openModalHandler(true)}
-              className="bg-blue-400 hover:bg-blue-600 text-white 
-              rounded-md text-sm font-semibold py-2 px-4 flex items-center gap-x-1"
-            >
+            <Button onClick={() => openModalHandler(true)}>
               <FaUserEdit />
               Edit Profile
-            </button>
+            </Button>
           </div>
         </div>
         {user.about ? (

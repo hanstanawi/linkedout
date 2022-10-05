@@ -13,6 +13,7 @@ import * as cloudinaryApi from 'api/cloudinary.api';
 import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { createExperience } from 'features/users/users.slice';
 import { usePersistForm } from 'hooks/use-persist-form';
+import Button from 'components/ui/Button';
 
 type CreateExperienceProps = {
   isOpen: boolean;
@@ -47,6 +48,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
         };
         // for the same user, set the data from local storage
         if (dataObj.userId === userId) {
+          // Parse the string date to Date object to satisfy ReactDatePicker
           const formattedStartDate = dataObj.startDate
             ? moment(dataObj.startDate).format('YYYY-MM-DD')
             : null;
@@ -175,7 +177,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
                   />
                   <button
                     type="button"
-                    className=" bg-blue-400  hover:bg-blue-600 text-white
+                    className="  bg-bgBlue hover:bg-bgDarkBlue text-white
               rounded-sm text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
                     onClick={() => setValue('companyLogo', null)}
                   >
@@ -247,14 +249,9 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
                     onChange={changeFileHandler}
                     className="border border-gray-200 flex-1 p-2 rounded-md font-light text-xs outline-blue-400"
                   />
-                  <button
-                    type="button"
-                    onClick={uploadImageHandler}
-                    className=" bg-blue-400  hover:bg-blue-600 text-white
-                  flex-shrink-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
-                  >
+                  <Button onClick={uploadImageHandler}>
                     {isUploading ? <LoadingSpinner /> : 'Upload'}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -410,7 +407,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
               </button>
               <button
                 type="submit"
-                className="bg-blue-400  hover:bg-blue-600 text-white
+                className=" bg-bgBlue hover:bg-bgDarkBlue text-white
                 flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
               >
                 {isLoading ? <LoadingSpinner /> : 'Submit'}

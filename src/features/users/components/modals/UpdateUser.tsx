@@ -13,6 +13,7 @@ import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { updateUser } from 'features/users/users.slice';
 import * as cloudinaryApi from 'api/cloudinary.api';
 import { usePersistForm } from 'hooks/use-persist-form';
+import Button from 'components/ui/Button';
 
 type UpdateUserModalProps = {
   isOpen: boolean;
@@ -163,7 +164,7 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
                   />
                   <button
                     type="button"
-                    className=" bg-blue-400  hover:bg-blue-600 text-white
+                    className="  bg-bgBlue hover:bg-bgDarkBlue text-white
                 rounded-sm text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
                     onClick={() => setValue('profileImage', null)}
                   >
@@ -279,14 +280,9 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
                     onChange={changeFileHandler}
                     className="border border-gray-200 flex-1 p-2 rounded-md font-light text-xs outline-blue-400"
                   />
-                  <button
-                    type="button"
-                    onClick={uploadImageHandler}
-                    className=" bg-blue-400  hover:bg-blue-600 text-white
-                  flex-shrink-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
-                  >
+                  <Button onClick={uploadImageHandler}>
                     {isUploading ? <LoadingSpinner /> : 'Upload'}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -315,7 +311,7 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
               </button>
               <button
                 type="submit"
-                className=" bg-blue-400  hover:bg-blue-600 text-white
+                className=" bg-bgBlue hover:bg-bgDarkBlue text-white
                   flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
               >
                 {isLoading ? <LoadingSpinner /> : 'Submit'}

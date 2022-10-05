@@ -17,7 +17,7 @@ function UserProfilePage() {
   if (requestStatus === 'loading') {
     content = (
       <div className="flex justify-center items-center h-[28rem]">
-        <LoadingSpinner color="rgb(96 165 250)" size={60} />
+        <LoadingSpinner color="#007CE7" size={60} />
       </div>
     );
   } else if (requestStatus === 'succeeded' && user) {

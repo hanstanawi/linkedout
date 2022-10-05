@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import Layout from 'components/layout/Layout';
+import Layout from 'components/ui/Layout';
 import UserProfile from 'features/users/pages/UserProfile';
 import Users from 'features/users/pages/Users';
 import NotFound from 'pages/NotFound';

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import moment from 'moment';
+import Button from 'components/ui/Button';
 import ExperienceItem from './ExperienceItem';
 import CreateExperience from './modals/CreateExperience';
 
@@ -53,14 +54,10 @@ function ExperiencesList({ experiences, userId }: ExperiencesListProps) {
       <section className="flex flex-col gap-y-6 justify-center items-center w-3/4 h-[80vh] mx-auto bg-white p-6 rounded-md shadow-md">
         <div className="flex justify-between w-full items-center">
           <h4 className="text-2xl font-semibold">Experience</h4>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            type="button"
-            className="bg-blue-400 hover:bg-blue-600 text-white rounded-md text-sm font-semibold py-2 px-4 flex items-center gap-x-1"
-          >
+          <Button onClick={() => setIsModalOpen(true)}>
             <FaPlus />
             Add Experience
-          </button>
+          </Button>
         </div>
 
         {content}

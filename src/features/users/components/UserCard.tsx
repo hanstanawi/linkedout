@@ -30,8 +30,8 @@ function UserCard({ user }: UserCardProps) {
           <div className="text-center w-full flex-grow-1 pt-4">
             <Link
               to={`/user/${user.id}`}
-              className="bg-blue-400 hover:bg-transparent hover:text-blue-400
-            hover:border hover:border-blue-400 text-white rounded-md text-sm 
+              className="bg-bgBlue hover:bg-transparent hover:text-customBlue
+            hover:border hover:border-customBlue text-white rounded-md text-sm 
             font-semibold py-2 px-4 text-center w-full"
             >
               View Profile
