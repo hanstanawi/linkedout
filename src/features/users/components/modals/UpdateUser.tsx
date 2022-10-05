@@ -142,6 +142,7 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
   const closeModalHandler = () => {
     setOpen(false);
     reset();
+    localStorage.removeItem(FORM_DATA_KEY);
   };
 
   return (

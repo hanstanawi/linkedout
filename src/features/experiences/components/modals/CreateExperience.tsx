@@ -151,6 +151,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
   const closeModalHandler = () => {
     setOpen(false);
     reset();
+    localStorage.removeItem(FORM_DATA_KEY);
   };
 
   const setCurrentJob = () => {

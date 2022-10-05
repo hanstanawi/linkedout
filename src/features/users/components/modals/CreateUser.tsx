@@ -125,6 +125,7 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
   const closeModalHandler = () => {
     setOpen(false);
     reset();
+    localStorage.removeItem(FORM_DATA_KEY);
   };
 
   return (
