@@ -1,10 +1,10 @@
 import { useParams } from 'react-router-dom';
 
-import ProfileHeader from 'components/profile/ProfileHeader';
-import ExperiencesList from 'components/experiences/ExperiencesList';
-import { useAppSelector } from 'hooks/useAppSelector';
-import { getUserById, getUsersStatus } from 'app/slices/users.slice';
-import LoadingSpinner from 'components/layout/LoadingSpinner';
+import ProfileHeader from 'features/users/components/ProfileHeader';
+import ExperiencesList from 'features/experiences/components/ExperiencesList';
+import { useAppSelector } from 'hooks/use-app-selector';
+import { getUserById, getUsersStatus } from 'features/users/users.slice';
+import LoadingSpinner from 'components/ui/LoadingSpinner';
 
 function UserProfilePage() {
   const { userId } = useParams();

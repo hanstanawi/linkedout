@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import * as usersApi from 'api/users.api';
-import * as experiencesApi from 'api/experiences.api';
-import type { RootState } from 'app/store';
+import * as usersApi from 'features/users/api/users.api';
+import * as experiencesApi from 'features/experiences/api/experiences.api';
+import type { RootState } from 'store';
 
 type FetchStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
 

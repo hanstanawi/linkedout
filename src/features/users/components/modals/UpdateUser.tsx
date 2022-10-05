@@ -1,24 +1,23 @@
 import cx from 'classnames';
 import moment from 'moment';
 import ReactDatePicker from 'react-datepicker';
-
 import { ChangeEvent, useState } from 'react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import Modal from 'components/modals/Modal';
-import LoadingSpinner from 'components/layout/LoadingSpinner';
+import LoadingSpinner from 'components/ui/LoadingSpinner';
 import placeholder from 'assets/profile-placeholder.png';
 
+import { useAppDispatch } from 'hooks/use-app-dispatch';
+import { updateUser } from 'features/users/users.slice';
 import * as cloudinaryApi from 'api/cloudinary.api';
-import { useAppDispatch } from 'hooks/useAppDispatch';
-import { createUser } from 'app/slices/users.slice';
-import { usePersistForm } from 'hooks/usePersistForm';
+import { usePersistForm } from 'hooks/use-persist-form';
 
-type CreateUserProps = {
+type UpdateUserModalProps = {
   isOpen: boolean;
   setOpen: (state: boolean) => void;
+  user: IUser;
 };
 
 type FormValues = {
@@ -29,33 +28,46 @@ type FormValues = {
   profileImage: string | null;
 };
 
-const FORM_DATA_KEY = 'createUser';
+const FORM_DATA_KEY = 'updateUser';
 
-function CreateUser({ isOpen, setOpen }: CreateUserProps) {
+function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
   const [isLoading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+
+  // Need to initialize birthDate as Date type
+  // to satisfy ReactDatePicker
+  const defaultUserValue = {
+    ...user,
+    birthDate: new Date(user.birthDate),
+  };
 
   const getDataFromLocalStorage = () => {
     const dataFromLocaleStorage = localStorage.getItem(FORM_DATA_KEY);
     if (dataFromLocaleStorage) {
       try {
-        const dataObj = JSON.parse(dataFromLocaleStorage) as FormValues;
-        const formattedBirthDate = moment(dataObj.birthDate).format(
-          'YYYY-MM-DD'
-        );
-
-        return {
-          ...dataObj,
-          birthDate: new Date(formattedBirthDate),
+        const dataObj = JSON.parse(dataFromLocaleStorage) as FormValues & {
+          id: string;
         };
+
+        if (dataObj.id === user.id) {
+          const formattedBirthDate = moment(dataObj.birthDate).format(
+            'YYYY-MM-DD'
+          );
+          return {
+            ...dataObj,
+            birthDate: new Date(formattedBirthDate),
+          };
+        }
+        // removing local storage data if updating different user
+        localStorage.removeItem(FORM_DATA_KEY);
       } catch (err) {
-        return undefined;
+        return defaultUserValue;
       }
     }
-    return undefined;
+    // return default user object from props
+    return defaultUserValue;
   };
 
   const {
@@ -64,15 +76,18 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
     handleSubmit,
     reset,
     setValue,
-    getValues,
     watch,
+    getValues,
     formState: { errors },
   } = useForm<FormValues>({
     mode: 'onSubmit',
     defaultValues: getDataFromLocalStorage(),
   });
 
-  usePersistForm({ value: watch(), localStorageKey: FORM_DATA_KEY });
+  usePersistForm({
+    value: { ...watch(), id: user.id },
+    localStorageKey: FORM_DATA_KEY,
+  });
 
   const profileImage = getValues('profileImage');
 
@@ -97,27 +112,29 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
     }
   };
 
-  const createUserHandler: SubmitHandler<FormValues> = async (data) => {
-    try {
-      setLoading(true);
+  const updateUserHandler: SubmitHandler<FormValues> = async (data) => {
+    if (user) {
+      try {
+        setLoading(true);
 
-      const userBody: IUserDto = {
-        ...data,
-        profileImage: data.profileImage || null,
-        birthDate: moment(data.birthDate).format('YYYY-MM-DD'),
-      };
+        const userBody = {
+          ...data,
+          id: user.id,
+          profileImage: data.profileImage || null,
+          birthDate: moment(data.birthDate).format('YYYY-MM-DD'),
+        };
 
-      const createdUser = await dispatch(createUser(userBody)).unwrap();
-      toast.success('User created!');
-      reset();
-      setOpen(false);
-      navigate(`/user/${createdUser.id}`);
-      localStorage.removeItem(FORM_DATA_KEY);
-    } catch (err: any) {
-      console.error(err);
-      toast.error(`Something wrong happened! ${err.message}`);
-    } finally {
-      setLoading(false);
+        await dispatch(updateUser(userBody)).unwrap();
+        reset();
+        setOpen(false);
+        toast.success('User updated');
+        localStorage.removeItem(FORM_DATA_KEY);
+      } catch (err: any) {
+        console.error(err);
+        toast.error(`Something wrong happened! ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -129,11 +146,11 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>
       <div className="w-full">
-        <h3 className="font-semibold text-xl pb-2">Add New Member</h3>
+        <h3 className="font-semibold text-xl pb-2">Update Profile</h3>
         <hr />
         <section>
           <form
-            onSubmit={handleSubmit(createUserHandler)}
+            onSubmit={handleSubmit(updateUserHandler)}
             className="flex flex-col gap-y-2 px-2 py-2"
           >
             <div className="h-96 overflow-y-auto">
@@ -147,7 +164,7 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                   <button
                     type="button"
                     className=" bg-blue-400  hover:bg-blue-600 text-white
-                  rounded-sm text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
+                rounded-sm text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
                     onClick={() => setValue('profileImage', null)}
                   >
                     Remove
@@ -285,6 +302,7 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                 />
               </div>
             </div>
+
             {/* CTA */}
             <div className="flex gap-x-2 pt-4 pb-1">
               <button
@@ -310,4 +328,4 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
   );
 }
 
-export default CreateUser;
+export default UpdateUser;

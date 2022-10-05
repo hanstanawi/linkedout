@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import moment from 'moment';
 import ExperienceItem from './ExperienceItem';
-import CreateExperience from './CreateExperience';
+import CreateExperience from './modals/CreateExperience';
 
 type ExperiencesListProps = {
   userId: string;

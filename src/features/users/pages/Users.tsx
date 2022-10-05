@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FaUserPlus } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import CreateUser from 'components/users/CreateUser';
-import UserCard from 'components/users/UserCard';
-import { useAppSelector } from 'hooks/useAppSelector';
+import CreateUser from 'features/users/components/modals/CreateUser';
+import UserCard from 'features/users/components/UserCard';
+import { useAppSelector } from 'hooks/use-app-selector';
 import {
   getAllUsers,
   getUsersError,
   getUsersStatus,
-} from 'app/slices/users.slice';
-import LoadingSpinner from 'components/layout/LoadingSpinner';
+} from 'features/users/users.slice';
+import LoadingSpinner from 'components/ui/LoadingSpinner';
 import moment from 'moment';
 
 function UsersPage() {
