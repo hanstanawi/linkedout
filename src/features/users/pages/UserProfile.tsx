@@ -17,12 +17,12 @@ function UserProfilePage() {
   if (requestStatus === 'loading') {
     content = (
       <div className="flex justify-center items-center h-[28rem]">
-        <LoadingSpinner color="rgb(96 165 250)" size={60} />
+        <LoadingSpinner color="#007CE7" size={60} />
       </div>
     );
   } else if (requestStatus === 'succeeded' && user) {
     content = (
-      <div className="py-10 flex gap-x-8 min-h-full">
+      <div className="py-10 flex lg:flex-row flex-col lg:gap-x-8 lg:gap-y-0 gap-y-6 min-h-full">
         <ProfileHeader user={user} />
         <ExperiencesList experiences={user.workExperiences} userId={user.id} />
       </div>

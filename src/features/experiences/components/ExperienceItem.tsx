@@ -33,11 +33,11 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
 
   return (
     <>
-      <li className="w-full flex justify-between gap-x-4">
+      <li className="w-full flex md:flex-row flex-col md:justify-between md:items-start items-center md:gap-x-4 md:gap-y-0 gap-x-0 gap-y-4">
         <div className="flex-shrink-0">
           {experience.companyLogo ? (
             <img
-              className="inline-block h-16 w-16 object-cover rounded-full"
+              className="inline-block md:h-16 h-12 md:w-16 w-12 object-cover rounded-full"
               src={experience.companyLogo}
               alt="profile"
             />
@@ -47,29 +47,33 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
             </div>
           )}
         </div>
-        <div className="flex-1">
+        <div className="flex-1 w-full">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">{experience.jobTitle}</h3>
+            <h3 className="md:text-lg text-base font-semibold">
+              {experience.jobTitle}
+            </h3>
             <div className="flex items-start">
               <button
                 type="button"
                 onClick={() => openModalHandler(true)}
-                className="bg-transparent py-1 px-3"
+                className="bg-transparent py-1 px-3 md:text-sm text-xs"
               >
                 <FaPen color="rgb(107 114 128)" />
               </button>
               <button
                 type="button"
                 onClick={() => setIsConfirmDelete(true)}
-                className="bg-transparent py-1 px-3"
+                className="bg-transparent py-1 px-3 md:text-sm text-xs"
               >
                 <FaTrashAlt color="rgb(220 38 38)" />
               </button>
             </div>
           </div>
-          <h4 className="text-base">{experience.companyName}</h4>
-          <p className="text-gray-400 font-light text-sm py-1">{`${startDate} - ${endDate}`}</p>
-          <p className="text-sm">{experience.jobDescription}</p>
+          <h4 className="md:text-base text-sm">{experience.companyName}</h4>
+          <p className="text-gray-400 font-light md:text-sm text-xs py-1">{`${startDate} - ${endDate}`}</p>
+          <p className="md:text-sm text-xs text-gray-500">
+            {experience.jobDescription}
+          </p>
         </div>
       </li>
       {isConfirmDelete && (

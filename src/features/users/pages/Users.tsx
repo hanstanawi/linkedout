@@ -11,6 +11,7 @@ import {
 } from 'features/users/users.slice';
 import LoadingSpinner from 'components/ui/LoadingSpinner';
 import moment from 'moment';
+import Button from 'components/ui/Button';
 
 function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,12 +40,12 @@ function UsersPage() {
   if (requestStatus === 'loading') {
     content = (
       <div className="flex justify-center items-center h-96">
-        <LoadingSpinner color="rgb(96 165 250)" size={60} />
+        <LoadingSpinner color="#007CE7" size={60} />
       </div>
     );
   } else if (requestStatus === 'succeeded' && sortedUsers.length) {
     content = (
-      <div className="flex lg:flex-row flex-col lg:items-start items-center lg:gap-x-8 gap-y-8 flex-wrap">
+      <div className="flex md:flex-row flex-col lg:items-start items-center md:gap-x-8 gap-y-8 flex-wrap">
         {sortedUsers.map((user) => (
           <UserCard key={user.id} user={user} />
         ))}
@@ -64,17 +65,12 @@ function UsersPage() {
   return (
     <>
       <section className="container mx-auto h-full">
-        <div className="flex justify-between py-6 items-center">
+        <div className="flex md:flex-row flex-col md:justify-between py-6 md:gap-y-0 gap-y-4 items-center">
           <h3 className="font-semibold text-2xl text-gray-800">Our Members</h3>
-          <button
-            type="button"
-            className="bg-blue-400 hover:bg-blue-600 text-white 
-            rounded-md text-sm font-semibold py-2 px-4 flex items-center gap-x-1"
-            onClick={() => setIsModalOpen(true)}
-          >
+          <Button onClick={() => setIsModalOpen(true)}>
             <FaUserPlus />
             Add Member
-          </button>
+          </Button>
         </div>
         {content}
       </section>

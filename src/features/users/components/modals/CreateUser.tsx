@@ -15,6 +15,7 @@ import * as cloudinaryApi from 'api/cloudinary.api';
 import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { createUser } from 'features/users/users.slice';
 import { usePersistForm } from 'hooks/use-persist-form';
+import Button from 'components/ui/Button';
 
 type CreateUserProps = {
   isOpen: boolean;
@@ -124,12 +125,15 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
   const closeModalHandler = () => {
     setOpen(false);
     reset();
+    localStorage.removeItem(FORM_DATA_KEY);
   };
 
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>
       <div className="w-full">
-        <h3 className="font-semibold text-xl pb-2">Add New Member</h3>
+        <h3 className="font-semibold md:text-xl text-lg pb-2">
+          Add New Member
+        </h3>
         <hr />
         <section>
           <form
@@ -142,11 +146,11 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                   <img
                     src={profileImage || placeholder}
                     alt="profile"
-                    className="inline-block h-20 w-20 object-cover rounded-full"
+                    className="inline-block md:h-20 h-16 md:w-20 w-16 object-cover rounded-full"
                   />
                   <button
                     type="button"
-                    className=" bg-blue-400  hover:bg-blue-600 text-white
+                    className="  bg-bgBlue hover:bg-bgDarkBlue text-white
                   rounded-sm text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
                     onClick={() => setValue('profileImage', null)}
                   >
@@ -157,7 +161,10 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
               {/* USER NAME */}
               <div className="flex gap-x-4 w-full py-1">
                 <div className="flex flex-1 flex-col gap-y-1.5">
-                  <label htmlFor="firstName" className="text-sm text-gray-600">
+                  <label
+                    htmlFor="firstName"
+                    className="md:text-sm text-xs text-gray-600"
+                  >
                     First Name
                   </label>
                   <input
@@ -169,12 +176,12 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                     placeholder="Your first name"
                     className={cx(
                       errors.firstName ? 'border-red-600' : 'border-gray-200',
-                      'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
+                      'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400'
                     )}
                   />
                   <p
                     className={cx(
-                      'text-[10px] font-light text-red-600',
+                      'md:text-[10px] text-[8px] font-light text-red-600',
                       errors.firstName ? 'opacity-100' : 'opacity-0'
                     )}
                   >
@@ -182,7 +189,10 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                   </p>
                 </div>
                 <div className="flex flex-1 flex-col gap-y-1.5">
-                  <label htmlFor="lastName" className="text-sm text-gray-600">
+                  <label
+                    htmlFor="lastName"
+                    className="md:text-sm text-xs text-gray-600"
+                  >
                     Last Name
                   </label>
                   <input
@@ -194,12 +204,12 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                     placeholder="Your last name"
                     className={cx(
                       errors.lastName ? 'border-red-600' : 'border-gray-200',
-                      'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
+                      'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400'
                     )}
                   />
                   <p
                     className={cx(
-                      'text-[10px] font-light text-red-600 -pt-1',
+                      'md:text-[10px] text-[8px] font-light text-red-600 -pt-1',
                       errors.lastName ? 'opacity-100' : 'opacity-0'
                     )}
                   >
@@ -210,7 +220,10 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
 
               {/* BIRTH DATE */}
               <div className="flex flex-1 flex-col gap-y-1.5 py-1">
-                <label htmlFor="lastName" className="text-sm">
+                <label
+                  htmlFor="lastName"
+                  className="md:text-sm text-xs text-gray-600"
+                >
                   Birth Date
                 </label>
                 <Controller
@@ -228,7 +241,7 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                             errors.birthDate
                               ? 'border-red-600'
                               : 'border-gray-200',
-                            'border p-2 rounded-md field-input font-light text-sm outline-blue-400 w-full'
+                            'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400 w-full'
                           )}
                           placeholderText="Select date"
                           selected={value}
@@ -244,7 +257,7 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                 />
                 <p
                   className={cx(
-                    'text-[10px] font-light text-red-600',
+                    'md:text-[10px] text-[8px] font-light text-red-600',
                     errors.birthDate ? 'opacity-100' : 'opacity-0'
                   )}
                 >
@@ -254,7 +267,12 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
 
               {/* PROFILE IMAGE */}
               <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
-                <label htmlFor="lastName">Profile Image</label>
+                <label
+                  htmlFor="lastName"
+                  className="md:text-sm text-xs text-gray-600"
+                >
+                  Profile Image
+                </label>
                 <div className="flex items-center gap-x-2">
                   <input
                     id="profileImage"
@@ -262,26 +280,26 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                     onChange={changeFileHandler}
                     className="border border-gray-200 flex-1 p-2 rounded-md font-light text-xs outline-blue-400"
                   />
-                  <button
-                    type="button"
-                    onClick={uploadImageHandler}
-                    className=" bg-blue-400  hover:bg-blue-600 text-white
-                  flex-shrink-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
-                  >
+                  <Button onClick={uploadImageHandler}>
                     {isUploading ? <LoadingSpinner /> : 'Upload'}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
               {/* ABOUT */}
               <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
-                <label htmlFor="lastName">About you</label>
+                <label
+                  htmlFor="lastName"
+                  className="md:text-sm text-xs text-gray-600"
+                >
+                  About you
+                </label>
                 <textarea
                   id="about"
                   {...register('about')}
                   rows={5}
                   placeholder="A few words to describe you"
-                  className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
+                  className="border border-gray-200 p-2 rounded-md font-light md:text-sm text-xs outline-blue-400"
                 />
               </div>
             </div>
@@ -291,14 +309,14 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
                 type="button"
                 onClick={closeModalHandler}
                 className="border border-gray-300 bg-white flex-1 hover:bg-gray-50 text-gray-700 
-                rounded-md text-sm font-semibold py-2 px-4"
+                rounded-md md:text-sm text-xs font-semibold py-2 px-4"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className=" bg-blue-400  hover:bg-blue-600 text-white
-                  flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
+                className=" bg-bgBlue hover:bg-bgDarkBlue text-white
+                  flex-1 rounded-md md:text-sm text-xs font-semibold py-2 px-4 flex justify-center"
               >
                 {isLoading ? <LoadingSpinner /> : 'Submit'}
               </button>
