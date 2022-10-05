@@ -5,6 +5,7 @@ import { useEffect, useState, ChangeEvent } from 'react';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
+import Button from 'components/ui/Button';
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/ui/LoadingSpinner';
 import placeholder from 'assets/profile-placeholder.png';
@@ -13,7 +14,7 @@ import * as cloudinaryApi from 'api/cloudinary.api';
 import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { createExperience } from 'features/users/users.slice';
 import { usePersistForm } from 'hooks/use-persist-form';
-import Button from 'components/ui/Button';
+import { CREATE_EXPERIENCE_LOCALSTORAGE_KEY } from '../../experiences.constants';
 
 type CreateExperienceProps = {
   isOpen: boolean;
@@ -31,16 +32,16 @@ type FormValues = {
   isCurrent: boolean;
 };
 
-const FORM_DATA_KEY = 'createExperience';
-
-function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
+function CreateExperience({ isOpen, setOpen, userId }: CreateExperienceProps) {
   const [isLoading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const dispatch = useAppDispatch();
 
   const getDataFromLocalStorage = () => {
-    const dataFromLocaleStorage = localStorage.getItem(FORM_DATA_KEY);
+    const dataFromLocaleStorage = localStorage.getItem(
+      CREATE_EXPERIENCE_LOCALSTORAGE_KEY
+    );
     if (dataFromLocaleStorage) {
       try {
         const dataObj = JSON.parse(dataFromLocaleStorage) as FormValues & {
@@ -64,7 +65,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
             endDate: formattedEndDate ? new Date(formattedEndDate) : null,
           };
         }
-        localStorage.removeItem(FORM_DATA_KEY);
+        localStorage.removeItem(CREATE_EXPERIENCE_LOCALSTORAGE_KEY);
       } catch (err) {
         return undefined;
       }
@@ -88,7 +89,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
 
   usePersistForm({
     value: { ...watch(), userId },
-    localStorageKey: FORM_DATA_KEY,
+    localStorageKey: CREATE_EXPERIENCE_LOCALSTORAGE_KEY,
   });
 
   const { isCurrent } = watch();
@@ -139,7 +140,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
       toast.success('Experience created!');
       reset();
       setOpen(false);
-      localStorage.removeItem(FORM_DATA_KEY);
+      localStorage.removeItem(CREATE_EXPERIENCE_LOCALSTORAGE_KEY);
     } catch (err: any) {
       console.error(err);
       toast.error(`Something wrong happened! ${err.message}`);
@@ -151,7 +152,7 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
   const closeModalHandler = () => {
     setOpen(false);
     reset();
-    localStorage.removeItem(FORM_DATA_KEY);
+    localStorage.removeItem(CREATE_EXPERIENCE_LOCALSTORAGE_KEY);
   };
 
   const setCurrentJob = () => {
@@ -445,4 +446,4 @@ function ExperienceModal({ isOpen, setOpen, userId }: CreateExperienceProps) {
   );
 }
 
-export default ExperienceModal;
+export default CreateExperience;

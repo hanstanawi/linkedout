@@ -33,7 +33,10 @@ function ExperienceItem({ experience, userId }: ExperienceItemProps) {
 
   return (
     <>
-      <li className="w-full flex md:flex-row flex-col md:justify-between md:items-start items-center md:gap-x-4 md:gap-y-0 gap-x-0 gap-y-4">
+      <li
+        className="w-full flex md:flex-row flex-col md:justify-between md:items-start items-center 
+      md:gap-x-4 md:gap-y-0 gap-x-0 gap-y-4 pb-4"
+      >
         <div className="flex-shrink-0">
           {experience.companyLogo ? (
             <img

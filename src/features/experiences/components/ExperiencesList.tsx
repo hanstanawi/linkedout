@@ -36,14 +36,10 @@ function ExperiencesList({ experiences, userId }: ExperiencesListProps) {
     content = (
       <ul className="flex flex-col w-full gap-y-4 p-4 h-full overflow-y-auto">
         {sortedExperiences.map((experience, i) => (
-          <>
-            <ExperienceItem
-              key={experience.id}
-              experience={experience}
-              userId={userId}
-            />
+          <div key={experience.id}>
+            <ExperienceItem experience={experience} userId={userId} />
             {i !== sortedExperiences.length - 1 && <hr />}
-          </>
+          </div>
         ))}
       </ul>
     );

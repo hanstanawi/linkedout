@@ -6,15 +6,16 @@ import { useEffect, useState, ChangeEvent } from 'react';
 import { toast } from 'react-toastify';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
+import Button from 'components/ui/Button';
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/ui/LoadingSpinner';
 import placeholder from 'assets/profile-placeholder.png';
 
+import * as cloudinaryApi from 'api/cloudinary.api';
 import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { updateExperience } from 'features/users/users.slice';
-import * as cloudinaryApi from 'api/cloudinary.api';
 import { usePersistForm } from 'hooks/use-persist-form';
-import Button from 'components/ui/Button';
+import { UPDATE_EXPERIENCE_LOCALSTORAGE_KEY } from 'features/experiences/experiences.constants';
 
 type UpdateExperienceProps = {
   isOpen: boolean;
@@ -32,8 +33,6 @@ type FormValues = {
   jobDescription: string | null;
   isCurrent: boolean;
 };
-
-const FORM_DATA_KEY = 'updateExperience';
 
 function UpdateExperience({
   isOpen,
@@ -53,7 +52,9 @@ function UpdateExperience({
   };
 
   const getDataFromLocalStorage = () => {
-    const dataFromLocaleStorage = localStorage.getItem(FORM_DATA_KEY);
+    const dataFromLocaleStorage = localStorage.getItem(
+      UPDATE_EXPERIENCE_LOCALSTORAGE_KEY
+    );
     if (dataFromLocaleStorage) {
       try {
         const dataObj = JSON.parse(dataFromLocaleStorage) as FormValues & {
@@ -78,7 +79,7 @@ function UpdateExperience({
         }
 
         // removing local storage data if updating different experience
-        localStorage.removeItem(FORM_DATA_KEY);
+        localStorage.removeItem(UPDATE_EXPERIENCE_LOCALSTORAGE_KEY);
       } catch (err) {
         return defaultExperienceValue;
       }
@@ -104,7 +105,7 @@ function UpdateExperience({
 
   usePersistForm({
     value: { ...watch(), id: experience.id },
-    localStorageKey: FORM_DATA_KEY,
+    localStorageKey: UPDATE_EXPERIENCE_LOCALSTORAGE_KEY,
   });
 
   const { isCurrent } = watch();
@@ -158,7 +159,7 @@ function UpdateExperience({
         toast.success('Experience updated!');
         reset();
         setOpen(false);
-        localStorage.removeItem(FORM_DATA_KEY);
+        localStorage.removeItem(UPDATE_EXPERIENCE_LOCALSTORAGE_KEY);
       } catch (err: any) {
         console.error(err);
         toast.error(`Something wrong happened! ${err.message}`);
@@ -171,7 +172,7 @@ function UpdateExperience({
   const closeModalHandler = () => {
     setOpen(false);
     reset();
-    localStorage.removeItem(FORM_DATA_KEY);
+    localStorage.removeItem(UPDATE_EXPERIENCE_LOCALSTORAGE_KEY);
   };
 
   const setCurrentJob = () => {

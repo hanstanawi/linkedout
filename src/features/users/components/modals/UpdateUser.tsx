@@ -5,15 +5,17 @@ import { ChangeEvent, useState } from 'react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
+import Button from 'components/ui/Button';
+
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/ui/LoadingSpinner';
 import placeholder from 'assets/profile-placeholder.png';
 
+import * as cloudinaryApi from 'api/cloudinary.api';
 import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { updateUser } from 'features/users/users.slice';
-import * as cloudinaryApi from 'api/cloudinary.api';
 import { usePersistForm } from 'hooks/use-persist-form';
-import Button from 'components/ui/Button';
+import { UPDATE_USER_LOCALSTORAGE_KEY } from 'features/users/users.constants';
 
 type UpdateUserModalProps = {
   isOpen: boolean;
@@ -29,8 +31,6 @@ type FormValues = {
   profileImage: string | null;
 };
 
-const FORM_DATA_KEY = 'updateUser';
-
 function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
   const [isLoading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -45,7 +45,9 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
   };
 
   const getDataFromLocalStorage = () => {
-    const dataFromLocaleStorage = localStorage.getItem(FORM_DATA_KEY);
+    const dataFromLocaleStorage = localStorage.getItem(
+      UPDATE_USER_LOCALSTORAGE_KEY
+    );
     if (dataFromLocaleStorage) {
       try {
         const dataObj = JSON.parse(dataFromLocaleStorage) as FormValues & {
@@ -62,7 +64,7 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
           };
         }
         // removing local storage data if updating different user
-        localStorage.removeItem(FORM_DATA_KEY);
+        localStorage.removeItem(UPDATE_USER_LOCALSTORAGE_KEY);
       } catch (err) {
         return defaultUserValue;
       }
@@ -87,7 +89,7 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
 
   usePersistForm({
     value: { ...watch(), id: user.id },
-    localStorageKey: FORM_DATA_KEY,
+    localStorageKey: UPDATE_USER_LOCALSTORAGE_KEY,
   });
 
   const profileImage = getValues('profileImage');
@@ -129,7 +131,7 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
         reset();
         setOpen(false);
         toast.success('User updated');
-        localStorage.removeItem(FORM_DATA_KEY);
+        localStorage.removeItem(UPDATE_USER_LOCALSTORAGE_KEY);
       } catch (err: any) {
         console.error(err);
         toast.error(`Something wrong happened! ${err.message}`);
@@ -142,7 +144,7 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserModalProps) {
   const closeModalHandler = () => {
     setOpen(false);
     reset();
-    localStorage.removeItem(FORM_DATA_KEY);
+    localStorage.removeItem(UPDATE_USER_LOCALSTORAGE_KEY);
   };
 
   return (
