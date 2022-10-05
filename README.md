@@ -4,6 +4,8 @@
 
 LinkedOut is a simple fictional app that mimics LinkedIn functionalities, built using React.js, TypeScript, and TailwindCSS to view, add, update users' work experiences profile.
 
+Deployed on Vercel: Visit [https://work-experience-app.vercel.app/](https://work-experience-app.vercel.app/) to open the app.
+
 ## Functionalities
 
 - Users could add a new profile.
