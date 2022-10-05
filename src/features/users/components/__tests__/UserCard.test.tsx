@@ -1,11 +1,8 @@
-import { expect, describe, it } from 'vitest';
-import {
-  formatBirthDateAsAge,
-  formatCurrentExperience,
-  formatDate,
-} from './format.helpers';
+import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import UserCard from '../UserCard';
 
-const MOCK_USER = {
+const mockUserProps = {
   id: 'f508f233-9cc0-4952-a4cd-3336b4f067c0',
   createdAt: '2022-10-02T06:55:47.386Z',
   updatedAt: '2022-10-04T13:22:57.872Z',
@@ -48,19 +45,32 @@ const MOCK_USER = {
   ],
 };
 
-describe('Test format helper functions', () => {
-  it('formatBirthDateAsAge should return user age', () => {
-    const age = formatBirthDateAsAge('1998-09-29T00:00:00.000Z');
-    expect(age).toBe(24);
+const MockUserCard = (
+  <BrowserRouter>
+    <UserCard user={mockUserProps} />
+  </BrowserRouter>
+);
+
+describe('UserCard Component', () => {
+  beforeEach(() => {
+    render(MockUserCard);
   });
 
-  it('formatDate should return correct date format (Nov 2021)', () => {
-    const age = formatDate('2021-11-11T00:00:00.000Z');
-    expect(age).toBe('Nov 2021');
+  it('Should show user name', () => {
+    const nameHeader = screen.getByRole('heading', { level: 3 });
+    expect(nameHeader).toBeInTheDocument();
+
+    const nameContent = screen.getByText(/Hans Tanawi/i);
+    expect(nameContent).toBeInTheDocument();
   });
 
-  it('formatCurrentExperience should return correct format', () => {
-    const currentPosition = formatCurrentExperience(MOCK_USER);
-    expect(currentPosition).toBe('Software Engineer at Lumina');
+  it('Should show user current title', () => {
+    const titleDiv = screen.getByText(/Software Engineer at Lumina/i);
+    expect(titleDiv).toBeInTheDocument();
+  });
+
+  it('Should show view profile link', () => {
+    const viewProfileLink = screen.getByRole('link', { name: 'View Profile' });
+    expect(viewProfileLink).toBeInTheDocument();
   });
 });
