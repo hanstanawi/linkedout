@@ -21,6 +21,11 @@ export function formatDate(date: string): string {
   return momentDate.format('MMM YYYY');
 }
 
+/**
+ * @description format current job title on user profile
+ * @param {IUser} user user object
+ * @returns {string} formatted current job title
+ */
 export function formatCurrentExperience(user: IUser): string {
   if (user.workExperiences.length) {
     const currentExperiences = user.workExperiences.filter(
