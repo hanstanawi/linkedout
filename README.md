@@ -114,6 +114,7 @@ There are several things that I want to improve if I have more time to work on t
 - Add more user fields, like email, phone, skills
 - Add company profile as a new entity.
 - Add more tests coverage.
+  - Add more component unit tests
 - Create more reusable UI components using Tailwind.
   - Tailwind is great; however, it bloats the JSX code with classnames. 
     It would be great that we can create custom reusable components using Tailwind classnames.
