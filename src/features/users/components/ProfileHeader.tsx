@@ -25,15 +25,20 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
 
   return (
     <>
-      <section className="flex flex-col flex-shrink justify-between items-center w-1/3 mx-auto bg-white px-10 py-8 h-[80vh] rounded-md shadow-md">
-        <div className="flex flex-col items-center gap-y-2 h-1/2">
+      <section
+        className="flex flex-col flex-shrink justify-between items-center lg:w-1/3 
+      w-11/12 mx-auto bg-white px-10 py-8 lg:h-[80vh] h-[50vh] rounded-md shadow-md"
+      >
+        <div className="flex flex-col items-center md:gap-y-2 gap-y-1.5 h-1/2">
           <img
-            className="inline-block h-20 w-20 object-cover rounded-full"
+            className="inline-block md:h-20 h-14 md:w-20 w-14 object-cover rounded-full"
             src={user.profileImage || placeholder}
             alt="profile"
           />
-          <h2 className="text-2xl font-semibold">{`${user.firstName} ${user.lastName}, ${userAge}`}</h2>
-          <p className="text-gray-400 font-light">{currentJob}</p>
+          <h2 className="lg:text-2xl text-lg font-semibold">{`${user.firstName} ${user.lastName}, ${userAge}`}</h2>
+          <p className="text-gray-400 lg:text-base text-sm font-light">
+            {currentJob}
+          </p>
           <div>
             <Button onClick={() => openModalHandler(true)}>
               <FaUserEdit />
@@ -42,9 +47,13 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
           </div>
         </div>
         {user.about ? (
-          <div className="flex flex-col items-center justify-start h-1/2 w-full gap-y-4 overflow-auto">
-            <h2 className="font-semibold text-lg">About {user.firstName}</h2>
-            <p className="text-gray-500 text-sm text-justify">{user.about}</p>
+          <div className="flex flex-col items-center md:justify-start justify-center md:h-1/2 w-full gap-y-4 overflow-auto md:pt-0 pt-20">
+            <h2 className="font-semibold md:text-lg text-base">
+              About {user.firstName}
+            </h2>
+            <p className="text-gray-500 md:text-sm text-xs text-justify">
+              {user.about}
+            </p>
           </div>
         ) : (
           <div className="h-full flex flex-col justify-center items-center w-full gap-y-1">

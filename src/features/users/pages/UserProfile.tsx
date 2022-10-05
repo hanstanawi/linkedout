@@ -22,7 +22,7 @@ function UserProfilePage() {
     );
   } else if (requestStatus === 'succeeded' && user) {
     content = (
-      <div className="py-10 flex gap-x-8 min-h-full">
+      <div className="py-10 flex lg:flex-row flex-col lg:gap-x-8 lg:gap-y-0 gap-y-6 min-h-full">
         <ProfileHeader user={user} />
         <ExperiencesList experiences={user.workExperiences} userId={user.id} />
       </div>

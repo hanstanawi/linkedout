@@ -45,7 +45,7 @@ function UsersPage() {
     );
   } else if (requestStatus === 'succeeded' && sortedUsers.length) {
     content = (
-      <div className="flex lg:flex-row flex-col lg:items-start items-center lg:gap-x-8 gap-y-8 flex-wrap">
+      <div className="flex md:flex-row flex-col lg:items-start items-center md:gap-x-8 gap-y-8 flex-wrap">
         {sortedUsers.map((user) => (
           <UserCard key={user.id} user={user} />
         ))}
@@ -65,7 +65,7 @@ function UsersPage() {
   return (
     <>
       <section className="container mx-auto h-full">
-        <div className="flex justify-between py-6 items-center">
+        <div className="flex md:flex-row flex-col md:justify-between py-6 md:gap-y-0 gap-y-4 items-center">
           <h3 className="font-semibold text-2xl text-gray-800">Our Members</h3>
           <Button onClick={() => setIsModalOpen(true)}>
             <FaUserPlus />

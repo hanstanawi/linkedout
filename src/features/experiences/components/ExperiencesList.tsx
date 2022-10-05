@@ -51,9 +51,12 @@ function ExperiencesList({ experiences, userId }: ExperiencesListProps) {
 
   return (
     <>
-      <section className="flex flex-col gap-y-6 justify-center items-center w-3/4 h-[80vh] mx-auto bg-white p-6 rounded-md shadow-md">
-        <div className="flex justify-between w-full items-center">
-          <h4 className="text-2xl font-semibold">Experience</h4>
+      <section
+        className="flex flex-col gap-y-6 justify-center items-center 
+      lg:w-3/4 w-11/12 lg:h-[80vh] h-[50vh] max-h-[50%] mx-auto bg-white p-6 rounded-md shadow-md"
+      >
+        <div className="flex flex-row justify-between gap-y-1 w-full items-center">
+          <h4 className="md:text-2xl text-lg font-semibold">Experience</h4>
           <Button onClick={() => setIsModalOpen(true)}>
             <FaPlus />
             Add Experience

@@ -11,7 +11,7 @@ function Button({ onClick, children }: ButtonProps) {
       type="button"
       onClick={onClick}
       className="bg-bgBlue hover:bg-bgDarkBlue text-white 
-  rounded-md text-sm font-semibold py-2 px-4 flex items-center gap-x-1"
+  rounded-md md:text-sm text-xs font-semibold py-2 px-4 flex items-center gap-x-1"
     >
       {children}
     </button>

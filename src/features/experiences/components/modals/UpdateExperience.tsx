@@ -86,6 +86,7 @@ function UpdateExperience({
     // return default experience object from props
     return defaultExperienceValue;
   };
+
   const {
     control,
     register,
@@ -180,7 +181,9 @@ function UpdateExperience({
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>
       <div className="w-full">
-        <h3 className="font-semibold text-xl pb-2">Update Experience</h3>
+        <h3 className="font-semibold md:text-xl text-lg pb-2">
+          Update Experience
+        </h3>
         <hr />
         <section>
           <form
@@ -193,12 +196,12 @@ function UpdateExperience({
                   <img
                     src={companyLogo || placeholder}
                     alt="profile"
-                    className="inline-block h-20 w-20 object-cover rounded-full"
+                    className="inline-block md:h-20 h-16 md:w-20 w-16 object-cover rounded-full"
                   />
                   <button
                     type="button"
-                    className=" bg-bgBlue hover:bg-bgDarkBlue text-white rounded-sm 
-                    text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
+                    className="  bg-bgBlue hover:bg-bgDarkBlue text-white
+              rounded-sm text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
                     onClick={() => setValue('companyLogo', null)}
                   >
                     Remove
@@ -207,7 +210,10 @@ function UpdateExperience({
               ) : null}
               {/* JOB TITLE */}
               <div className="flex flex-1 flex-col gap-y-1 py-1">
-                <label htmlFor="lastName" className="text-sm">
+                <label
+                  htmlFor="lastName"
+                  className="md:text-sm text-xs text-gray-600"
+                >
                   Job Title
                 </label>
                 <input
@@ -219,7 +225,7 @@ function UpdateExperience({
                   placeholder="Job Title"
                   className={cx(
                     errors.jobTitle ? 'border-red-600' : 'border-gray-200',
-                    'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
+                    'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400'
                   )}
                 />
                 <p
@@ -234,7 +240,10 @@ function UpdateExperience({
 
               {/* COMPANY NAME */}
               <div className="flex flex-1 flex-col gap-y-1 py-1">
-                <label htmlFor="lastName" className="text-sm">
+                <label
+                  htmlFor="lastName"
+                  className="md:text-sm text-xs text-gray-600"
+                >
                   Company Name
                 </label>
                 <input
@@ -243,9 +252,10 @@ function UpdateExperience({
                   {...register('companyName', {
                     required: 'Company name is required',
                   })}
+                  placeholder="Company Name"
                   className={cx(
                     errors.companyName ? 'border-red-600' : 'border-gray-200',
-                    'border p-2 rounded-md field-input font-light text-sm outline-blue-400'
+                    'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400'
                   )}
                 />
                 <p
@@ -260,13 +270,18 @@ function UpdateExperience({
 
               {/* COMPANY LOGO */}
               <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
-                <label htmlFor="lastName">Company Logo</label>
+                <label
+                  htmlFor="lastName"
+                  className="md:text-sm text-xs text-gray-600"
+                >
+                  Company Logo
+                </label>
                 <div className="flex items-center gap-x-2">
                   <input
                     id="companyLogo"
                     type="file"
                     onChange={changeFileHandler}
-                    className="border border-gray-200 flex-1 p-2 rounded-md font-light text-xs outline-blue-400"
+                    className="border border-gray-200 flex-1 p-2 rounded-md font-light md:text-sm text-xs outline-blue-400"
                   />
                   <Button onClick={uploadImageHandler}>
                     {isUploading ? <LoadingSpinner /> : 'Upload'}
@@ -277,7 +292,10 @@ function UpdateExperience({
               {/* PERIOD */}
               <div className="flex gap-x-4 w-full py-1">
                 <div className="flex flex-1 flex-col gap-y-1">
-                  <label htmlFor="firstName" className="text-sm text-gray-600">
+                  <label
+                    htmlFor="firstName"
+                    className="md:text-sm text-xs text-gray-600"
+                  >
                     Start Date
                   </label>
                   <Controller
@@ -307,7 +325,7 @@ function UpdateExperience({
                               errors.startDate
                                 ? 'border-red-600'
                                 : 'border-gray-200',
-                              'border p-2 rounded-md field-input font-light text-sm outline-blue-400 w-full'
+                              'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400 w-full'
                             )}
                             placeholderText="Start date"
                             selected={value}
@@ -331,7 +349,10 @@ function UpdateExperience({
                   </p>
                 </div>
                 <div className="flex flex-1 flex-col gap-y-1">
-                  <label htmlFor="lastName" className="text-sm text-gray-600">
+                  <label
+                    htmlFor="lastName"
+                    className="md:text-sm text-xs text-gray-600"
+                  >
                     End Date
                   </label>
                   <Controller
@@ -359,7 +380,7 @@ function UpdateExperience({
                               errors.endDate
                                 ? 'border-red-600'
                                 : 'border-gray-200',
-                              'border p-2 rounded-md field-input font-light text-sm outline-blue-400 w-full'
+                              'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400 w-full'
                             )}
                             placeholderText="End date"
                             selected={value}
@@ -387,28 +408,32 @@ function UpdateExperience({
 
               {/* JOB DESC */}
               <div className="flex flex-1 flex-col gap-y-1 text-sm py-1">
-                <label htmlFor="lastName">Job Description</label>
+                <label
+                  htmlFor="lastName"
+                  className="md:text-sm text-xs text-gray-600"
+                >
+                  Job Description
+                </label>
                 <textarea
                   id="about"
                   {...register('jobDescription')}
                   rows={6}
                   placeholder="A few words about your job"
-                  className="border border-gray-200 p-2 rounded-md font-light text-sm outline-blue-400"
+                  className="border border-gray-200 p-2 rounded-md font-light md:text-sm text-xs outline-blue-400"
                 />
               </div>
-
               {/* CURRENT JOB */}
               <div className="flex items-center my-2.5">
                 <input
                   type="checkbox"
                   id="isCurrentJob"
-                  className="h-4 w-4 cursor-pointer border-transparent"
+                  className="md:h-4 h-3 md:w-4 w-3 cursor-pointer border-transparent"
                   onClick={setCurrentJob}
                   {...register('isCurrent')}
                 />
                 <label
-                  htmlFor="preorder"
-                  className="text-black text-sm ml-2 cursor-pointer"
+                  htmlFor="isCurrentJob"
+                  className="text-black md:text-sm text-xs ml-2 cursor-pointer"
                 >
                   I&apos;m currently working here
                 </label>
@@ -420,14 +445,14 @@ function UpdateExperience({
                 type="button"
                 onClick={closeModalHandler}
                 className="border border-gray-300 bg-white flex-1 hover:bg-gray-50 text-gray-700 
-                rounded-md text-sm font-semibold py-2 px-4"
+                rounded-md md:text-sm text-xs font-semibold py-2 px-4"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 className=" bg-bgBlue hover:bg-bgDarkBlue text-white
-                flex-1 rounded-md text-sm font-semibold py-2 px-4 flex justify-center"
+                flex-1 rounded-md md:text-sm text-xs font-semibold py-2 px-4 flex justify-center"
               >
                 {isLoading ? <LoadingSpinner /> : 'Submit'}
               </button>
