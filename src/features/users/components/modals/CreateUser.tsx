@@ -7,6 +7,7 @@ import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+import Button from 'components/ui/Button';
 import Modal from 'components/modals/Modal';
 import LoadingSpinner from 'components/ui/LoadingSpinner';
 import placeholder from 'assets/profile-placeholder.png';
@@ -15,7 +16,7 @@ import * as cloudinaryApi from 'api/cloudinary.api';
 import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { createUser } from 'features/users/users.slice';
 import { usePersistForm } from 'hooks/use-persist-form';
-import Button from 'components/ui/Button';
+import { CREATE_USER_LOCALSTORAGE_KEY } from 'features/users/users.constants';
 
 type CreateUserProps = {
   isOpen: boolean;
@@ -30,8 +31,6 @@ type FormValues = {
   profileImage: string | null;
 };
 
-const FORM_DATA_KEY = 'createUser';
-
 function CreateUser({ isOpen, setOpen }: CreateUserProps) {
   const [isLoading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -40,7 +39,9 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
   const navigate = useNavigate();
 
   const getDataFromLocalStorage = () => {
-    const dataFromLocaleStorage = localStorage.getItem(FORM_DATA_KEY);
+    const dataFromLocaleStorage = localStorage.getItem(
+      CREATE_USER_LOCALSTORAGE_KEY
+    );
     if (dataFromLocaleStorage) {
       try {
         const dataObj = JSON.parse(dataFromLocaleStorage) as FormValues;
@@ -73,7 +74,10 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
     defaultValues: getDataFromLocalStorage(),
   });
 
-  usePersistForm({ value: watch(), localStorageKey: FORM_DATA_KEY });
+  usePersistForm({
+    value: watch(),
+    localStorageKey: CREATE_USER_LOCALSTORAGE_KEY,
+  });
 
   const profileImage = getValues('profileImage');
 
@@ -113,7 +117,7 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
       reset();
       setOpen(false);
       navigate(`/user/${createdUser.id}`);
-      localStorage.removeItem(FORM_DATA_KEY);
+      localStorage.removeItem(CREATE_USER_LOCALSTORAGE_KEY);
     } catch (err: any) {
       console.error(err);
       toast.error(`Something wrong happened! ${err.message}`);
@@ -125,7 +129,7 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
   const closeModalHandler = () => {
     setOpen(false);
     reset();
-    localStorage.removeItem(FORM_DATA_KEY);
+    localStorage.removeItem(CREATE_USER_LOCALSTORAGE_KEY);
   };
 
   return (
