@@ -61,7 +61,7 @@ yarn dev
 npm run dev
 ```
 
-Note: before running in development mode, make sure to create an `.env.local` file in root directory and copy this config
+Note: before running in development mode, make sure to create an `.env.local` file in root directory and copy this config and make sure that the backend api is already running.
 ```
 VITE_API_BASE_URL=http://localhost:3000
 ```
