@@ -36,7 +36,7 @@ Deployed on Vercel: Visit [https://work-experience-app.vercel.app/](https://work
 * [Redux Toolkit](https://redux-toolkit.js.org/)
 * [React Hook Form](https://react-hook-form.com/)
 * [Vite](https://vitejs.dev/)
-* [Cloudinary)(https://cloudinary.com/)
+* [Cloudinary](https://cloudinary.com/)
 
 ## State Management
 For state management, I use Redux Toolkit that provides out of the box Redux setup to manage global state of the app. Each features' state and reducers are managed by slices which is one of the main features of Redux Toolkit.
