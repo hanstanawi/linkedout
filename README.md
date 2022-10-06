@@ -36,6 +36,7 @@ Deployed on Vercel: Visit [https://work-experience-app.vercel.app/](https://work
 * [Redux Toolkit](https://redux-toolkit.js.org/)
 * [React Hook Form](https://react-hook-form.com/)
 * [Vite](https://vitejs.dev/)
+* [Cloudinary)(https://cloudinary.com/)
 
 ## State Management
 For state management, I use Redux Toolkit that provides out of the box Redux setup to manage global state of the app. Each features' state and reducers are managed by slices which is one of the main features of Redux Toolkit.
@@ -58,6 +59,11 @@ yarn dev
 // or
 
 npm run dev
+```
+
+Note: before running in development mode, make sure to create an `.env.local` file in root directory and copy this config
+```
+VITE_API_BASE_URL=http://localhost:3000
 ```
 
 **Build**
