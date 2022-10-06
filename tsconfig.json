@@ -25,6 +25,7 @@
       "features/*": ["features/*"],
       "helpers/*": ["helpers/*"],
       "hooks/*": ["hooks/*"],
+      "test/*": ["test/*"],
       "types/*": ["types/*"],
     }
   },
