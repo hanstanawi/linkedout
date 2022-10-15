@@ -14,3 +14,13 @@ interface IExperience extends IExperienceDto {
   createdAt: string;
   updatedAt: string;
 }
+
+interface IExperienceForm {
+  jobTitle: string;
+  startDate: Date;
+  endDate: Date | null;
+  companyName: string;
+  companyLogo: string | null;
+  jobDescription: string | null;
+  isCurrent: boolean;
+}
