@@ -6,7 +6,7 @@ import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { updateUser } from 'features/users/users.slice';
 import { UPDATE_USER_LOCALSTORAGE_KEY } from 'features/users/users.constants';
 import { SubmitHandler } from 'react-hook-form';
-import UserForm from '../UserForm';
+import UserForm from '../forms/UserForm';
 
 type UpdateUserProps = {
   isOpen: boolean;

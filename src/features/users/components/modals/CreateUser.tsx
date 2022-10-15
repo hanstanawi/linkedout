@@ -9,7 +9,8 @@ import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { createUser } from 'features/users/users.slice';
 import { CREATE_USER_LOCALSTORAGE_KEY } from 'features/users/users.constants';
 import { SubmitHandler } from 'react-hook-form';
-import UserForm from '../UserForm';
+import { useCallback } from 'react';
+import UserForm from '../forms/UserForm';
 
 type CreateUserProps = {
   isOpen: boolean;
@@ -20,7 +21,7 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const getDataFromLocalStorage = () => {
+  const getDataFromLocalStorage = useCallback(() => {
     const dataFromLocaleStorage = localStorage.getItem(
       CREATE_USER_LOCALSTORAGE_KEY
     );
@@ -40,19 +41,22 @@ function CreateUser({ isOpen, setOpen }: CreateUserProps) {
       }
     }
     return undefined;
-  };
+  }, []);
 
-  const createUserHandler: SubmitHandler<IUserForm> = async (data) => {
-    const userBody: IUserDto = {
-      ...data,
-      profileImage: data.profileImage || null,
-      birthDate: moment(data.birthDate).format('YYYY-MM-DD'),
-    };
+  const createUserHandler: SubmitHandler<IUserForm> = useCallback(
+    async (data) => {
+      const userBody: IUserDto = {
+        ...data,
+        profileImage: data.profileImage || null,
+        birthDate: moment(data.birthDate).format('YYYY-MM-DD'),
+      };
 
-    const createdUser = await dispatch(createUser(userBody)).unwrap();
-    toast.success('User created!');
-    navigate(`/user/${createdUser.id}`);
-  };
+      const createdUser = await dispatch(createUser(userBody)).unwrap();
+      toast.success('User created!');
+      navigate(`/user/${createdUser.id}`);
+    },
+    [dispatch, navigate]
+  );
 
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>

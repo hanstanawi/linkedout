@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FaUserEdit } from 'react-icons/fa';
 
 import placeholder from 'assets/profile-placeholder.png';
@@ -19,9 +19,9 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
   const userAge = formatBirthDateAsAge(user.birthDate);
   const currentJob = formatCurrentExperience(user);
 
-  const openModalHandler = (state: boolean) => {
+  const openModalHandler = useCallback((state: boolean) => {
     setIsModalOpen(state);
-  };
+  }, []);
 
   return (
     <>

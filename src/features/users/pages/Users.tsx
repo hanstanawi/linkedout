@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaUserPlus } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import CreateUser from 'features/users/components/modals/CreateUser';
@@ -25,9 +25,9 @@ function UsersPage() {
     }
   }, [error]);
 
-  const openModalHandler = (state: boolean) => {
+  const openModalHandler = useCallback((state: boolean) => {
     setIsModalOpen(state);
-  };
+  }, []);
 
   const sortedUsers = useMemo(() => {
     return [...users].sort((a, b) => {
