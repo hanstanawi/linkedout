@@ -53,7 +53,7 @@ function ExperiencesList({ experiences, userId }: ExperiencesListProps) {
       >
         <div className="flex flex-row justify-between gap-y-1 w-full items-center">
           <h4 className="md:text-2xl text-lg font-semibold">Experience</h4>
-          <Button onClick={() => setIsModalOpen(true)}>
+          <Button onClick={() => setIsModalOpen(true)} actionType="primary">
             <FaPlus />
             Add Experience
           </Button>

@@ -40,7 +40,11 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
             {currentJob}
           </p>
           <div>
-            <Button buttonType="button" onClick={() => openModalHandler(true)}>
+            <Button
+              buttonType="button"
+              onClick={() => openModalHandler(true)}
+              actionType="primary"
+            >
               <FaUserEdit />
               Edit Profile
             </Button>

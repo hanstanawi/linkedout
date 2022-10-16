@@ -6,10 +6,11 @@ import LoadingSpinner from 'components/ui/LoadingSpinner';
 import Input from 'components/form-inputs/Input';
 import FilePicker from 'components/form-inputs/FilePicker';
 import TextArea from 'components/form-inputs/TextArea';
-
-import { usePersistForm } from 'hooks/use-persist-form';
 import ImageDisplay from 'components/form-inputs/ImageDisplay';
 import DatePicker from 'components/form-inputs/DatePicker';
+import Button from 'components/ui/Button';
+
+import { usePersistForm } from 'hooks/use-persist-form';
 
 type UserFormProps = {
   localStorageKey: string;
@@ -138,21 +139,22 @@ function UserForm({
       </div>
       {/* CTA */}
       <div className="flex gap-x-2 pt-4 pb-1">
-        <button
-          type="button"
+        <Button
           onClick={closeModalHandler}
-          className="border border-gray-300 bg-white flex-1 hover:bg-gray-50 text-gray-700 
-        rounded-md md:text-sm text-xs font-semibold py-2 px-4"
+          buttonType="button"
+          layout="full"
+          actionType="secondary"
         >
           Cancel
-        </button>
-        <button
-          type="submit"
-          className=" bg-bgBlue hover:bg-bgDarkBlue text-white
-          flex-1 rounded-md md:text-sm text-xs font-semibold py-2 px-4 flex justify-center"
+        </Button>
+        <Button
+          onClick={() => {}}
+          buttonType="submit"
+          layout="full"
+          actionType="primary"
         >
           {isLoading ? <LoadingSpinner /> : 'Submit'}
-        </button>
+        </Button>
       </div>
     </form>
   );

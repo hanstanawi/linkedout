@@ -198,15 +198,20 @@ function ExperienceForm({
 
       {/* CTA */}
       <div className="flex gap-x-2 pt-4 pb-1">
-        <button
-          type="button"
+        <Button
           onClick={closeModalHandler}
-          className="border border-gray-300 bg-white flex-1 hover:bg-gray-50 text-gray-700 
-      rounded-md md:text-sm text-xs font-semibold py-2 px-4"
+          buttonType="button"
+          layout="full"
+          actionType="secondary"
         >
           Cancel
-        </button>
-        <Button onClick={() => {}} buttonType="submit">
+        </Button>
+        <Button
+          onClick={() => {}}
+          buttonType="submit"
+          layout="full"
+          actionType="primary"
+        >
           {isLoading ? <LoadingSpinner /> : 'Submit'}
         </Button>
       </div>

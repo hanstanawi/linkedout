@@ -46,7 +46,11 @@ function FilePicker({ label, onSetImage }: FilePickerProps) {
           onChange={changeFileHandler}
           className="border border-gray-200 flex-1 p-2 rounded-md font-light text-xs outline-blue-400"
         />
-        <Button buttonType="button" onClick={uploadImageHandler}>
+        <Button
+          buttonType="button"
+          onClick={uploadImageHandler}
+          actionType="primary"
+        >
           {isUploading ? <LoadingSpinner /> : 'Upload'}
         </Button>
       </div>
