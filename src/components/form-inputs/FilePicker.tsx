@@ -1,20 +1,36 @@
 import { useState, ChangeEvent } from 'react';
+import { toast } from 'react-toastify';
 import Button from 'components/ui/Button';
 import LoadingSpinner from 'components/ui/LoadingSpinner';
+import * as cloudinaryApi from 'api/cloudinary.api';
 
 type FilePickerProps = {
   label: string;
-  isUploading: boolean;
-  onUploadImage: (image: File | null) => Promise<void>;
+  onSetImage: (imageUrl: string) => void;
 };
 
-function FilePicker({ label, isUploading, onUploadImage }: FilePickerProps) {
+function FilePicker({ label, onSetImage }: FilePickerProps) {
   const [image, setImage] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const changeFileHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (files) {
       setImage(files[0]);
+    }
+  };
+
+  const uploadImageHandler = async () => {
+    if (image) {
+      try {
+        setIsUploading(true);
+        const uploadedImage = await cloudinaryApi.uploadImage(image);
+        onSetImage(uploadedImage.url);
+      } catch (err: any) {
+        toast.error(`Upload failed ${err.message}`);
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -30,7 +46,7 @@ function FilePicker({ label, isUploading, onUploadImage }: FilePickerProps) {
           onChange={changeFileHandler}
           className="border border-gray-200 flex-1 p-2 rounded-md font-light text-xs outline-blue-400"
         />
-        <Button onClick={() => onUploadImage(image)}>
+        <Button buttonType="button" onClick={uploadImageHandler}>
           {isUploading ? <LoadingSpinner /> : 'Upload'}
         </Button>
       </div>

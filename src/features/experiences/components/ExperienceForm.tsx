@@ -2,14 +2,18 @@ import cx from 'classnames';
 import moment from 'moment';
 import ReactDatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 
-import LoadingSpinner from 'components/ui/LoadingSpinner';
+import TextArea from 'components/form-inputs/TextArea';
+import Checkbox from 'components/form-inputs/Checkbox';
 import Button from 'components/ui/Button';
-import placeholder from 'assets/profile-placeholder.png';
+import ImageDisplay from 'components/form-inputs/ImageDisplay';
+import Input from 'components/form-inputs/Input';
+import FilePicker from 'components/form-inputs/FilePicker';
+import LoadingSpinner from 'components/ui/LoadingSpinner';
+
 import { usePersistForm } from 'hooks/use-persist-form';
-import * as cloudinaryApi from 'api/cloudinary.api';
 
 type ExperienceFormProps = {
   localStorageKey: string;
@@ -27,8 +31,6 @@ function ExperienceForm({
   userId,
 }: ExperienceFormProps) {
   const [isLoading, setLoading] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [image, setImage] = useState<File | null>(null);
   const {
     control,
     register,
@@ -57,26 +59,12 @@ function ExperienceForm({
     }
   }, [isCurrent, setValue]);
 
-  const changeFileHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const { files } = e.target;
-    if (files) {
-      setImage(files[0]);
-    }
-  };
-
-  const uploadImageHandler = async () => {
-    if (image) {
-      try {
-        setIsUploading(true);
-        const uploadedImage = await cloudinaryApi.uploadImage(image);
-        setValue('companyLogo', uploadedImage.url);
-      } catch (err: any) {
-        toast.error(`Upload failed ${err.message}`);
-      } finally {
-        setIsUploading(false);
-      }
-    }
-  };
+  const setCompanyLogoHandler = useCallback(
+    (imageUrl: string): void => {
+      setValue('companyLogo', imageUrl);
+    },
+    [setValue]
+  );
 
   const submitHandler: SubmitHandler<IExperienceForm> = async (data) => {
     try {
@@ -99,9 +87,13 @@ function ExperienceForm({
     localStorage.removeItem(localStorageKey);
   };
 
-  const setCurrentJob = () => {
+  const setCurrentJob = useCallback(() => {
     setValue('isCurrent', !isCurrent, { shouldValidate: true });
-  };
+  }, [isCurrent, setValue]);
+
+  const removeImageHandler = useCallback(() => {
+    setValue('companyLogo', null);
+  }, [setValue]);
 
   return (
     <form
@@ -110,102 +102,36 @@ function ExperienceForm({
     >
       <div className="h-[27rem] overflow-y-auto">
         {companyLogo && companyLogo.length ? (
-          <div className="flex flex-col items-center justify-center py-3">
-            <img
-              src={companyLogo || placeholder}
-              alt="profile"
-              className="inline-block md:h-20 h-16 md:w-20 w-16 object-cover rounded-full"
-            />
-            <button
-              type="button"
-              className="  bg-bgBlue hover:bg-bgDarkBlue text-white
-    rounded-sm text-[9px] font-semibold py-0.5 px-4 mt-1 flex justify-center"
-              onClick={() => setValue('companyLogo', null)}
-            >
-              Remove
-            </button>
-          </div>
+          <ImageDisplay
+            imageSrc={companyLogo}
+            imageAlt="company-logo"
+            onRemoveImage={removeImageHandler}
+          />
         ) : null}
         {/* JOB TITLE */}
-        <div className="flex flex-1 flex-col gap-y-1 py-1">
-          <label
-            htmlFor="lastName"
-            className="md:text-sm text-xs text-gray-600"
-          >
-            Job Title
-          </label>
-          <input
-            type="text"
-            id="jobTitle"
-            {...register('jobTitle', {
-              required: 'Job title is required',
-            })}
-            placeholder="Job Title"
-            className={cx(
-              errors.jobTitle ? 'border-red-600' : 'border-gray-200',
-              'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400'
-            )}
-          />
-          <p
-            className={cx(
-              'text-[10px] font-light text-red-600',
-              errors.jobTitle ? 'opacity-100' : 'opacity-0'
-            )}
-          >
-            {errors.jobTitle?.message}
-          </p>
-        </div>
+        <Input
+          label="Job Title"
+          register={register}
+          error={errors.jobTitle}
+          required
+          errorMessage="Job title is required"
+          name="jobTitle"
+          placeholder="Job Title"
+        />
 
         {/* COMPANY NAME */}
-        <div className="flex flex-1 flex-col gap-y-1 py-1">
-          <label
-            htmlFor="lastName"
-            className="md:text-sm text-xs text-gray-600"
-          >
-            Company Name
-          </label>
-          <input
-            type="text"
-            id="companyName"
-            {...register('companyName', {
-              required: 'Company name is required',
-            })}
-            placeholder="Company Name"
-            className={cx(
-              errors.companyName ? 'border-red-600' : 'border-gray-200',
-              'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400'
-            )}
-          />
-          <p
-            className={cx(
-              'text-[10px] font-light text-red-600',
-              errors.companyName ? 'opacity-100' : 'opacity-0'
-            )}
-          >
-            {errors.companyName?.message}
-          </p>
-        </div>
+        <Input
+          label="Company Name"
+          register={register}
+          error={errors.companyName}
+          required
+          errorMessage="Company name is required"
+          name="companyName"
+          placeholder="Company Name"
+        />
 
         {/* COMPANY LOGO */}
-        <div className="flex flex-1 flex-col gap-y-2 text-sm py-1">
-          <label
-            htmlFor="lastName"
-            className="md:text-sm text-xs text-gray-600"
-          >
-            Company Logo
-          </label>
-          <div className="flex items-center gap-x-2">
-            <input
-              id="companyLogo"
-              type="file"
-              onChange={changeFileHandler}
-              className="border border-gray-200 flex-1 p-2 rounded-md font-light md:text-sm text-xs outline-blue-400"
-            />
-            <Button onClick={uploadImageHandler}>
-              {isUploading ? <LoadingSpinner /> : 'Upload'}
-            </Button>
-          </div>
-        </div>
+        <FilePicker label="Company Logo" onSetImage={setCompanyLogoHandler} />
 
         {/* PERIOD */}
         <div className="flex gap-x-4 w-full py-1">
@@ -321,37 +247,20 @@ function ExperienceForm({
         </div>
 
         {/* JOB DESC */}
-        <div className="flex flex-1 flex-col gap-y-1 text-sm py-1">
-          <label
-            htmlFor="lastName"
-            className="md:text-sm text-xs text-gray-600"
-          >
-            Job Description
-          </label>
-          <textarea
-            id="about"
-            {...register('jobDescription')}
-            rows={6}
-            placeholder="A few words about your job"
-            className="border border-gray-200 p-2 rounded-md font-light md:text-sm text-xs outline-blue-400"
-          />
-        </div>
+        <TextArea
+          label="Job Description"
+          register={register}
+          placeholder="A few words about your job"
+          name="jobDescription"
+        />
+
         {/* CURRENT JOB */}
-        <div className="flex items-center my-2.5">
-          <input
-            type="checkbox"
-            id="isCurrentJob"
-            className="md:h-4 h-3 md:w-4 w-3 cursor-pointer border-transparent"
-            onClick={setCurrentJob}
-            {...register('isCurrent')}
-          />
-          <label
-            htmlFor="isCurrentJob"
-            className="text-black md:text-sm text-xs ml-2 cursor-pointer"
-          >
-            I&apos;m currently working here
-          </label>
-        </div>
+        <Checkbox
+          label="I'm currently working here"
+          onCheck={setCurrentJob}
+          register={register}
+          name="isCurrent"
+        />
       </div>
 
       {/* CTA */}
@@ -364,13 +273,9 @@ function ExperienceForm({
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          className=" bg-bgBlue hover:bg-bgDarkBlue text-white
-      flex-1 rounded-md md:text-sm text-xs font-semibold py-2 px-4 flex justify-center"
-        >
+        <Button onClick={() => {}} buttonType="submit">
           {isLoading ? <LoadingSpinner /> : 'Submit'}
-        </button>
+        </Button>
       </div>
     </form>
   );
