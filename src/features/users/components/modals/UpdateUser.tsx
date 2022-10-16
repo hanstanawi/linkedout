@@ -6,7 +6,8 @@ import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { updateUser } from 'features/users/users.slice';
 import { UPDATE_USER_LOCALSTORAGE_KEY } from 'features/users/users.constants';
 import { SubmitHandler } from 'react-hook-form';
-import UserForm from '../forms/UserForm';
+import { useCallback, useMemo } from 'react';
+import UserForm from '../UserForm';
 
 type UpdateUserProps = {
   isOpen: boolean;
@@ -19,12 +20,14 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserProps) {
 
   // Need to initialize birthDate as Date type
   // to satisfy ReactDatePicker
-  const defaultUserValue = {
-    ...user,
-    birthDate: new Date(user.birthDate),
-  };
+  const defaultUserValue = useMemo(() => {
+    return {
+      ...user,
+      birthDate: new Date(user.birthDate),
+    };
+  }, [user]);
 
-  const getDataFromLocalStorage = () => {
+  const getDataFromLocalStorage = useCallback(() => {
     const dataFromLocaleStorage = localStorage.getItem(
       UPDATE_USER_LOCALSTORAGE_KEY
     );
@@ -51,21 +54,24 @@ function UpdateUser({ isOpen, setOpen, user }: UpdateUserProps) {
     }
     // return default user object from props
     return defaultUserValue;
-  };
+  }, [user.id, defaultUserValue]);
 
-  const updateUserHandler: SubmitHandler<IUserForm> = async (data) => {
-    if (user) {
-      const userBody = {
-        ...data,
-        id: user.id,
-        profileImage: data.profileImage || null,
-        birthDate: moment(data.birthDate).format('YYYY-MM-DD'),
-      };
+  const updateUserHandler: SubmitHandler<IUserForm> = useCallback(
+    async (data) => {
+      if (user) {
+        const userBody = {
+          ...data,
+          id: user.id,
+          profileImage: data.profileImage || null,
+          birthDate: moment(data.birthDate).format('YYYY-MM-DD'),
+        };
 
-      await dispatch(updateUser(userBody)).unwrap();
-      toast.success('User updated');
-    }
-  };
+        await dispatch(updateUser(userBody)).unwrap();
+        toast.success('User updated');
+      }
+    },
+    [dispatch, user]
+  );
 
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>

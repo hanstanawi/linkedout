@@ -8,6 +8,7 @@ import Modal from 'components/modals/Modal';
 import { useAppDispatch } from 'hooks/use-app-dispatch';
 import { updateExperience } from 'features/users/users.slice';
 import { UPDATE_EXPERIENCE_LOCALSTORAGE_KEY } from 'features/experiences/experiences.constants';
+import { useCallback, useMemo } from 'react';
 import ExperienceForm from '../ExperienceForm';
 
 type UpdateExperienceProps = {
@@ -25,13 +26,15 @@ function UpdateExperience({
 }: UpdateExperienceProps) {
   const dispatch = useAppDispatch();
 
-  const defaultExperienceValue = {
-    ...experience,
-    startDate: new Date(experience.startDate),
-    endDate: experience.endDate ? new Date(experience.endDate) : null,
-  };
+  const defaultExperienceValue = useMemo(() => {
+    return {
+      ...experience,
+      startDate: new Date(experience.startDate),
+      endDate: experience.endDate ? new Date(experience.endDate) : null,
+    };
+  }, [experience]);
 
-  const getDataFromLocalStorage = () => {
+  const getDataFromLocalStorage = useCallback(() => {
     const dataFromLocaleStorage = localStorage.getItem(
       UPDATE_EXPERIENCE_LOCALSTORAGE_KEY
     );
@@ -66,28 +69,29 @@ function UpdateExperience({
     }
     // return default experience object from props
     return defaultExperienceValue;
-  };
+  }, [defaultExperienceValue, experience.id]);
 
-  const updateExperienceHandler: SubmitHandler<IExperienceForm> = async (
-    data
-  ) => {
-    if (experience) {
-      const experienceBody = {
-        ...data,
-        id: experience.id,
-        companyLogo: data.companyLogo || null,
-        startDate: moment(data.startDate).format('YYYY-MM-DD'),
-        endDate: data.endDate
-          ? moment(data.endDate).format('YYYY-MM-DD')
-          : null,
-        userId,
-      };
+  const updateExperienceHandler: SubmitHandler<IExperienceForm> = useCallback(
+    async (data) => {
+      if (experience) {
+        const experienceBody = {
+          ...data,
+          id: experience.id,
+          companyLogo: data.companyLogo || null,
+          startDate: moment(data.startDate).format('YYYY-MM-DD'),
+          endDate: data.endDate
+            ? moment(data.endDate).format('YYYY-MM-DD')
+            : null,
+          userId,
+        };
 
-      await dispatch(updateExperience(experienceBody)).unwrap();
+        await dispatch(updateExperience(experienceBody)).unwrap();
 
-      toast.success('Experience updated!');
-    }
-  };
+        toast.success('Experience updated!');
+      }
+    },
+    [dispatch, userId, experience]
+  );
 
   return (
     <Modal setOpen={setOpen} isOpen={isOpen}>

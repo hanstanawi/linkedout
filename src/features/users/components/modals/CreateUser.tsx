@@ -10,7 +10,7 @@ import { createUser } from 'features/users/users.slice';
 import { CREATE_USER_LOCALSTORAGE_KEY } from 'features/users/users.constants';
 import { SubmitHandler } from 'react-hook-form';
 import { useCallback } from 'react';
-import UserForm from '../forms/UserForm';
+import UserForm from '../UserForm';
 
 type CreateUserProps = {
   isOpen: boolean;

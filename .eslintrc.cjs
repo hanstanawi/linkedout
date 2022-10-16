@@ -28,5 +28,6 @@ module.exports = {
     'react/jsx-props-no-spreading': 0,
     'no-param-reassign': 0,
     'react/require-default-props': 0,
+    'react/button-has-type': 0,
   },
 };
