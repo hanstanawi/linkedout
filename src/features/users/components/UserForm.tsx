@@ -133,6 +133,7 @@ function UserForm({
           placeholder="A few words to describe you"
           register={register}
           name="about"
+          required={false}
         />
       </div>
       {/* CTA */}
