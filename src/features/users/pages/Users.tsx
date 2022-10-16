@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaUserPlus } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import CreateUser from 'features/users/components/modals/CreateUser';
@@ -25,9 +25,9 @@ function UsersPage() {
     }
   }, [error]);
 
-  const openModalHandler = useCallback((state: boolean) => {
+  const openModalHandler = (state: boolean) => {
     setIsModalOpen(state);
-  }, []);
+  };
 
   const sortedUsers = useMemo(() => {
     return [...users].sort((a, b) => {
@@ -67,7 +67,7 @@ function UsersPage() {
       <section className="container mx-auto h-full">
         <div className="flex md:flex-row flex-col md:justify-between py-6 md:gap-y-0 gap-y-4 items-center">
           <h3 className="font-semibold text-2xl text-gray-800">Our Members</h3>
-          <Button onClick={() => setIsModalOpen(true)}>
+          <Button buttonType="button" onClick={() => setIsModalOpen(true)}>
             <FaUserPlus />
             Add Member
           </Button>
