@@ -1,12 +1,11 @@
-import cx from 'classnames';
 import moment from 'moment';
-import ReactDatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
-import { useState, useEffect, useCallback } from 'react';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useForm, SubmitHandler, Validate } from 'react-hook-form';
 
 import TextArea from 'components/form-inputs/TextArea';
 import Checkbox from 'components/form-inputs/Checkbox';
+import DatePicker from 'components/form-inputs/DatePicker';
 import Button from 'components/ui/Button';
 import ImageDisplay from 'components/form-inputs/ImageDisplay';
 import Input from 'components/form-inputs/Input';
@@ -52,6 +51,28 @@ function ExperienceForm({
 
   const { isCurrent } = watch();
   const companyLogo = getValues('companyLogo');
+
+  const startDateValidation: Record<string, Validate<Date>> = useMemo(() => {
+    return {
+      isBeforeEndDate: (v) => {
+        const endDateVal = getValues('endDate');
+        if (!endDateVal) {
+          return true;
+        }
+        return moment(v).isBefore(endDateVal) || 'Must be before end date';
+      },
+    };
+  }, [getValues]);
+
+  const endDateValidation: Record<string, Validate<Date>> = useMemo(() => {
+    return {
+      isAfterStartDate: (v) => {
+        const startDateVal = getValues('startDate');
+        if (isCurrent) return true;
+        return moment(v).isAfter(startDateVal) || 'Must be after start date';
+      },
+    };
+  }, [getValues, isCurrent]);
 
   useEffect(() => {
     if (isCurrent) {
@@ -135,115 +156,26 @@ function ExperienceForm({
 
         {/* PERIOD */}
         <div className="flex gap-x-4 w-full py-1">
-          <div className="flex flex-1 flex-col gap-y-1">
-            <label
-              htmlFor="firstName"
-              className="md:text-sm text-xs text-gray-600"
-            >
-              Start Date
-            </label>
-            <Controller
-              control={control}
-              name="startDate"
-              rules={{
-                required: 'Start date is required',
-                validate: {
-                  isBeforeEndDate: (v) => {
-                    const endDateVal = getValues('endDate');
-                    if (!endDateVal) {
-                      return true;
-                    }
-                    return (
-                      moment(v).isBefore(endDateVal) ||
-                      'Must be before end date'
-                    );
-                  },
-                },
-              }}
-              render={({ field: { value, ...fieldProps } }) => {
-                return (
-                  <div>
-                    <ReactDatePicker
-                      {...fieldProps}
-                      className={cx(
-                        errors.startDate ? 'border-red-600' : 'border-gray-200',
-                        'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400 w-full'
-                      )}
-                      placeholderText="Start date"
-                      selected={value}
-                      dateFormat="yyyy/MM/dd"
-                      maxDate={new Date()}
-                      showMonthDropdown
-                      showYearDropdown
-                      dropdownMode="select"
-                    />
-                  </div>
-                );
-              }}
-            />
-            <p
-              className={cx(
-                'text-[10px] font-light text-red-600',
-                errors.startDate ? 'opacity-100' : 'opacity-0'
-              )}
-            >
-              {errors.startDate?.message}
-            </p>
-          </div>
-          <div className="flex flex-1 flex-col gap-y-1">
-            <label
-              htmlFor="lastName"
-              className="md:text-sm text-xs text-gray-600"
-            >
-              End Date
-            </label>
-            <Controller
-              control={control}
-              name="endDate"
-              rules={{
-                required: !isCurrent ? 'End date is required' : false,
-                validate: {
-                  isAfterStartDate: (v) => {
-                    const startDateVal = getValues('startDate');
-                    if (isCurrent) return true;
-                    return (
-                      moment(v).isAfter(startDateVal) ||
-                      'Must be after start date'
-                    );
-                  },
-                },
-              }}
-              render={({ field: { value, ...fieldProps } }) => {
-                return (
-                  <div>
-                    <ReactDatePicker
-                      {...fieldProps}
-                      className={cx(
-                        errors.endDate ? 'border-red-600' : 'border-gray-200',
-                        'border p-2 rounded-md field-input font-light md:text-sm text-xs outline-blue-400 w-full'
-                      )}
-                      placeholderText="End date"
-                      selected={value}
-                      disabled={isCurrent}
-                      maxDate={new Date()}
-                      dateFormat="yyyy/MM/dd"
-                      showMonthDropdown
-                      showYearDropdown
-                      dropdownMode="select"
-                    />
-                  </div>
-                );
-              }}
-            />
-            <p
-              className={cx(
-                'text-[10px] font-light text-red-600',
-                errors.endDate ? 'opacity-100' : 'opacity-0'
-              )}
-            >
-              {errors.endDate?.message}
-            </p>
-          </div>
+          <DatePicker
+            label="Start Date"
+            control={control}
+            name="startDate"
+            required
+            errorMessage="Start date is required"
+            placeholder="Start date"
+            error={errors.startDate}
+            validation={startDateValidation}
+          />
+          <DatePicker
+            label="End Date"
+            control={control}
+            name="endDate"
+            required={!isCurrent}
+            errorMessage="End date is required"
+            placeholder="End date"
+            error={errors.endDate}
+            validation={endDateValidation}
+          />
         </div>
 
         {/* JOB DESC */}
@@ -252,6 +184,7 @@ function ExperienceForm({
           register={register}
           placeholder="A few words about your job"
           name="jobDescription"
+          required={false}
         />
 
         {/* CURRENT JOB */}

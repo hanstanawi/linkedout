@@ -9,19 +9,19 @@ import {
   Control,
 } from 'react-hook-form';
 
-type DatePickerProps<T extends FieldValues> = {
+type DatePickerProps<T extends FieldValues, U> = {
   control: Control<T>;
   label: string;
   error: FieldError | undefined;
   name: Path<T>;
   required: boolean;
   errorMessage: string;
-  validation?: Validate<T>;
+  validation?: Record<string, Validate<U>>;
   isDisabled?: boolean;
   placeholder: string;
 };
 
-function DatePicker<T extends FieldValues>({
+function DatePicker<T extends FieldValues, U>({
   control,
   name,
   label,
@@ -31,7 +31,7 @@ function DatePicker<T extends FieldValues>({
   validation,
   isDisabled = false,
   placeholder,
-}: DatePickerProps<T>) {
+}: DatePickerProps<T, U>) {
   return (
     <div className="flex flex-1 flex-col gap-y-1">
       <label htmlFor={name} className="md:text-sm text-xs text-gray-600">
