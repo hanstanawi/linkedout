@@ -14,3 +14,11 @@ interface IUser extends IUserDto {
   updatedAt: string;
   workExperiences: IExperience[];
 }
+
+interface IUserForm {
+  firstName: string;
+  lastName: string;
+  birthDate: Date;
+  about: string | null;
+  profileImage: string | null;
+}
